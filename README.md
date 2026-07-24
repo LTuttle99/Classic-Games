@@ -1,10 +1,12 @@
-# Card Games
+# Game Arcade
 
-A small arcade of six classic card games, each playable against AI opponents.
-Pure HTML/CSS/JS, no build step, no dependencies, no backend — everything
-runs client-side and deploys as static files.
+Fourteen classic games, each playable against AI (or solo). Pure HTML/CSS/JS,
+no build step, no dependencies, no backend — everything runs client-side and
+deploys as static files.
 
-Open `index.html` for a hub page linking to each game:
+Open `index.html` for a hub page linking to each game.
+
+## Cards
 
 | Game | Folder | What it is |
 |---|---|---|
@@ -14,6 +16,24 @@ Open `index.html` for a hub page linking to each game:
 | UNO | `uno/` | You + 3 AI, full action-card deck, scored rounds to 500 points |
 | Solitaire | `solitaire/` | Classic Klondike, click-to-select-and-move, hint button, auto-finish |
 | War | `war/` | Highest card wins, ties go to war, optional auto-play |
+
+## Board & Puzzle
+
+| Game | Folder | What it is |
+|---|---|---|
+| Checkers | `checkers/` | Standard rules — mandatory capture, multi-jump chains, kings, alpha-beta AI |
+| Connect Four | `connect4/` | Drop discs, four-in-a-row, alpha-beta AI with a heuristic evaluator |
+| Tic-Tac-Toe | `tictactoe/` | Perfect-play minimax AI — unbeatable, best you can do is draw |
+| 2048 | `2048/` | Sliding tile merge game, arrow keys or swipe, best score saved locally |
+| Memory | `memory/` | Flip-and-match concentration game, easy/hard grid sizes, move + time tracking |
+
+## Arcade
+
+| Game | Folder | What it is |
+|---|---|---|
+| Tetris | `tetris/` | 7-bag randomizer, next-piece preview, ghost piece, increasing speed |
+| Snake | `snake/` | Grid-tick movement, on-screen D-pad + keyboard, speeds up as you grow |
+| Pong | `pong/` | Real-time physics, mouse/touch/keyboard paddle control, first to 7 |
 
 Each game is fully self-contained in its own folder (`index.html`, `style.css`,
 `game.js` for engine/AI, `ui.js` for rendering) — nothing is shared between
@@ -41,7 +61,7 @@ reliable.)
    ```
    git init
    git add .
-   git commit -m "Card games"
+   git commit -m "Game arcade"
    git branch -M main
    git remote add origin https://github.com/<you>/<repo>.git
    git push -u origin main
@@ -52,7 +72,15 @@ reliable.)
 
 3. The site will be live at `https://<you>.github.io/<repo>/` within a
    minute or two, with each game reachable at `/euchre/`, `/poker/`,
-   `/blackjack/`, `/uno/`, `/solitaire/`, `/war/`.
+   `/checkers/`, `/tetris/`, etc.
+
+### Uploading by drag-and-drop instead of git
+
+GitHub's repo page also supports **Add file → Upload files**, where you can
+drag files straight from Finder/Explorer. If you use that route, drag the
+*contents* of this folder (select-all inside it), not the folder itself —
+dragging the folder nests everything one level deeper and `index.html` won't
+be found at the repo root.
 
 ## Notes on scope / simplifications
 
@@ -61,7 +89,12 @@ reliable.)
   a known simplification (fine for a casual free-chip game, not casino-exact
   for multi-way all-ins).
 - **Blackjack**: no split-hand support (hit/stand/double only).
-- **Chip balances** (Blackjack, Poker) persist in the browser's
-  `localStorage`, so they survive a page reload but are local to that browser.
-- AI opponents in every game use hand-tuned heuristics, not solved/optimal
-  strategy — they play reasonably but are beatable.
+- **Tetris**: simplified (non-SRS) rotation system with basic wall kicks, no
+  hold piece, single next-piece preview.
+- **Chip balances** (Blackjack, Poker) and **best scores** (2048, Snake,
+  Tetris) persist in the browser's `localStorage`, so they survive a page
+  reload but are local to that browser.
+- AI opponents in every game use hand-tuned heuristics or minimax search, not
+  a single unified engine — Tic-Tac-Toe and Checkers/Connect Four use
+  (alpha-beta) minimax and play very strong; Euchre, Hold'em, and UNO use
+  scoring heuristics and are beatable.

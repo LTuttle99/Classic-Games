@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Connect Four</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔴</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="hub-link" href="../">&larr; Games</a>
+    <h1>Connect Four</h1>
+    <div id="scores">
+      <div class="score-pill"><span class="team-label">You</span><span id="score-r">0</span></div>
+      <div class="score-pill"><span class="team-label">Draws</span><span id="score-draw">0</span></div>
+      <div class="score-pill"><span class="team-label">CPU</span><span id="score-y">0</span></div>
+    </div>
+    <button id="new-game-btn">Reset Scores</button>
+  </header>
+
+  <div id="table">
+    <div id="board-wrap">
+      <div id="board"></div>
+    </div>
+  </div>
+
+  <div id="controls"></div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

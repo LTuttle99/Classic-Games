@@ -3,60 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Card Games</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🂡</text></svg>">
+<title>Game Arcade</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕹️</text></svg>">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="app">
   <header>
-    <h1>Card Games</h1>
-    <p class="tagline">Six classic card games. No install, no account — just play.</p>
+    <h1>Game Arcade</h1>
+    <p class="tagline">Fourteen classic games. No install, no account — just play.</p>
   </header>
 
-  <div class="grid">
-    <a class="tile" href="euchre/">
-      <div class="tile-icon">🂡</div>
-      <h2>Euchre</h2>
-      <p>Trick-taking partnership game. Call trump, go alone, play to 10 points.</p>
-      <span class="tag">4 players &middot; partners</span>
-    </a>
+  <section class="category">
+    <h2>Cards</h2>
+    <div class="grid">
+      <a class="tile" href="euchre/">
+        <div class="tile-icon">🂡</div>
+        <h3>Euchre</h3>
+        <p>Trick-taking partnership game. Call trump, go alone, play to 10 points.</p>
+        <span class="tag">4 players &middot; partners</span>
+      </a>
+      <a class="tile" href="poker/">
+        <div class="tile-icon">🂮</div>
+        <h3>Texas Hold'em</h3>
+        <p>No-limit poker with blinds, community cards, and a real betting round.</p>
+        <span class="tag">4 players &middot; chips</span>
+      </a>
+      <a class="tile" href="blackjack/">
+        <div class="tile-icon">🂱</div>
+        <h3>Blackjack</h3>
+        <p>Beat the dealer. Hit, stand, or double down. Blackjack pays 3:2.</p>
+        <span class="tag">1 player &middot; chips</span>
+      </a>
+      <a class="tile" href="uno/">
+        <div class="tile-icon">🂫</div>
+        <h3>UNO</h3>
+        <p>Match color or number, stack skips and draws, call UNO at your last card.</p>
+        <span class="tag">4 players</span>
+      </a>
+      <a class="tile" href="solitaire/">
+        <div class="tile-icon">🂭</div>
+        <h3>Solitaire</h3>
+        <p>Classic Klondike. Clear the tableau, build the foundations, beat the deck.</p>
+        <span class="tag">1 player</span>
+      </a>
+      <a class="tile" href="war/">
+        <div class="tile-icon">🂾</div>
+        <h3>War</h3>
+        <p>Highest card wins. Ties go to war. Simple, fast, no decisions to make.</p>
+        <span class="tag">1 player</span>
+      </a>
+    </div>
+  </section>
 
-    <a class="tile" href="poker/">
-      <div class="tile-icon">🂮</div>
-      <h2>Texas Hold'em</h2>
-      <p>No-limit poker with blinds, community cards, and a real betting round.</p>
-      <span class="tag">4 players &middot; chips</span>
-    </a>
+  <section class="category">
+    <h2>Board &amp; Puzzle</h2>
+    <div class="grid">
+      <a class="tile" href="checkers/">
+        <div class="tile-icon">⚫</div>
+        <h3>Checkers</h3>
+        <p>Standard rules with mandatory capture, multi-jumps, and kings.</p>
+        <span class="tag">2 players</span>
+      </a>
+      <a class="tile" href="connect4/">
+        <div class="tile-icon">🔴</div>
+        <h3>Connect Four</h3>
+        <p>Drop discs, connect four in a row before the CPU does.</p>
+        <span class="tag">2 players</span>
+      </a>
+      <a class="tile" href="tictactoe/">
+        <div class="tile-icon">⭕</div>
+        <h3>Tic-Tac-Toe</h3>
+        <p>Classic 3x3. The CPU plays perfectly — can you force a draw?</p>
+        <span class="tag">2 players</span>
+      </a>
+      <a class="tile" href="2048/">
+        <div class="tile-icon">🔢</div>
+        <h3>2048</h3>
+        <p>Slide and merge tiles to reach 2048 (and beyond).</p>
+        <span class="tag">1 player</span>
+      </a>
+      <a class="tile" href="memory/">
+        <div class="tile-icon">🧠</div>
+        <h3>Memory</h3>
+        <p>Flip cards, find every pair, beat your best time.</p>
+        <span class="tag">1 player</span>
+      </a>
+    </div>
+  </section>
 
-    <a class="tile" href="blackjack/">
-      <div class="tile-icon">🂱</div>
-      <h2>Blackjack</h2>
-      <p>Beat the dealer. Hit, stand, or double down. Blackjack pays 3:2.</p>
-      <span class="tag">1 player &middot; chips</span>
-    </a>
-
-    <a class="tile" href="uno/">
-      <div class="tile-icon">🂫</div>
-      <h2>UNO</h2>
-      <p>Match color or number, stack skips and draws, call UNO at your last card.</p>
-      <span class="tag">4 players</span>
-    </a>
-
-    <a class="tile" href="solitaire/">
-      <div class="tile-icon">🂭</div>
-      <h2>Solitaire</h2>
-      <p>Classic Klondike. Clear the tableau, build the foundations, beat the deck.</p>
-      <span class="tag">1 player</span>
-    </a>
-
-    <a class="tile" href="war/">
-      <div class="tile-icon">🂾</div>
-      <h2>War</h2>
-      <p>Highest card wins. Ties go to war. Simple, fast, no decisions to make.</p>
-      <span class="tag">1 player</span>
-    </a>
-  </div>
+  <section class="category">
+    <h2>Arcade</h2>
+    <div class="grid">
+      <a class="tile" href="tetris/">
+        <div class="tile-icon">🧱</div>
+        <h3>Tetris</h3>
+        <p>Falling blocks, line clears, and a next-piece preview. Speeds up as you go.</p>
+        <span class="tag">1 player</span>
+      </a>
+      <a class="tile" href="snake/">
+        <div class="tile-icon">🐍</div>
+        <h3>Snake</h3>
+        <p>Eat, grow, don't hit the walls or yourself.</p>
+        <span class="tag">1 player</span>
+      </a>
+      <a class="tile" href="pong/">
+        <div class="tile-icon">🏓</div>
+        <h3>Pong</h3>
+        <p>First to 7 wins. Mouse, touch, or arrow keys.</p>
+        <span class="tag">1 player</span>
+      </a>
+    </div>
+  </section>
 
   <footer>Open source &middot; runs entirely in your browser</footer>
 </div>

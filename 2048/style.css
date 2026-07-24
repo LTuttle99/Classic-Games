@@ -1,0 +1,154 @@
+:root {
+  --gold: #e8c469;
+  --panel: #2d2013ee;
+  --board-bg: #bba088;
+  --cell-bg: #cec1b2;
+  --tile-size: 78px;
+  --gap: 12px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(ellipse at center, #4a3a24 0%, #241a0e 100%);
+  color: #f2f2f2;
+}
+
+#app { display: flex; flex-direction: column; height: 100vh; min-height: 560px; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  background: var(--panel);
+  box-shadow: 0 2px 8px #0006;
+  flex-wrap: wrap;
+}
+#topbar h1 { font-size: 1.2rem; margin: 0; color: var(--gold); letter-spacing: 1px; }
+.hub-link {
+  color: #f2f2f2cc;
+  text-decoration: none;
+  font-size: 0.8rem;
+  background: #00000040;
+  padding: 5px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.hub-link:hover { background: #00000066; color: #fff; }
+#scores { display: flex; gap: 8px; }
+.score-pill {
+  background: #00000055;
+  border: 1px solid #ffffff33;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.score-pill .team-label { font-size: 0.7rem; opacity: 0.8; }
+.score-pill span:last-child { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+#new-game-btn { margin-left: auto; }
+
+button {
+  background: var(--gold);
+  color: #2a1e00;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: scale(0.96); }
+
+#table { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; gap: 14px; }
+
+#board-wrap {
+  position: relative;
+  width: calc(4 * var(--tile-size) + 5 * var(--gap));
+  height: calc(4 * var(--tile-size) + 5 * var(--gap));
+  background: var(--board-bg);
+  border-radius: 10px;
+  padding: var(--gap);
+  touch-action: none;
+}
+
+#grid-bg {
+  position: absolute;
+  inset: var(--gap);
+  display: grid;
+  grid-template-columns: repeat(4, var(--tile-size));
+  grid-template-rows: repeat(4, var(--tile-size));
+  gap: var(--gap);
+}
+#grid-bg::before { content: ''; }
+#grid-bg { }
+#grid-bg .cell-bg {
+  background: var(--cell-bg);
+  border-radius: 6px;
+}
+
+#tiles {
+  position: absolute;
+  inset: var(--gap);
+  display: grid;
+  grid-template-columns: repeat(4, var(--tile-size));
+  grid-template-rows: repeat(4, var(--tile-size));
+  gap: var(--gap);
+}
+
+.tile {
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.8rem;
+  animation: pop 0.15s ease;
+}
+@keyframes pop {
+  from { transform: scale(0.5); }
+  to { transform: scale(1); }
+}
+
+.tile-2 { background: #eee4da; color: #776e65; }
+.tile-4 { background: #ede0c8; color: #776e65; }
+.tile-8 { background: #f2b179; color: #fff; }
+.tile-16 { background: #f59563; color: #fff; }
+.tile-32 { background: #f67c5f; color: #fff; }
+.tile-64 { background: #f65e3b; color: #fff; }
+.tile-128 { background: #edcf72; color: #fff; font-size: 1.6rem; }
+.tile-256 { background: #edcc61; color: #fff; font-size: 1.6rem; }
+.tile-512 { background: #edc850; color: #fff; font-size: 1.6rem; }
+.tile-1024 { background: #edc53f; color: #fff; font-size: 1.4rem; }
+.tile-2048 { background: #edc22e; color: #fff; font-size: 1.4rem; box-shadow: 0 0 20px #edc22e99; }
+.tile-super { background: #3c3a32; color: #f2f2f2; font-size: 1.3rem; }
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  background: #00000099;
+  border-radius: 10px;
+}
+#overlay.show { display: flex; }
+#overlay .overlay-msg { font-size: 1.4rem; font-weight: 700; color: var(--gold); }
+
+#hint { font-size: 0.8rem; opacity: 0.6; text-align: center; max-width: 340px; }
+
+@media (max-width: 480px) {
+  :root { --tile-size: 64px; --gap: 8px; }
+  #topbar h1 { display: none; }
+  .tile { font-size: 1.4rem; }
+}

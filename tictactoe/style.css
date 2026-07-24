@@ -1,0 +1,111 @@
+:root {
+  --gold: #e8c469;
+  --panel: #1a1a2eee;
+  --x-color: #4fd1c5;
+  --o-color: #f2789f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(ellipse at center, #232347 0%, #0e0e1e 100%);
+  color: #f2f2f2;
+}
+
+#app { display: flex; flex-direction: column; height: 100vh; min-height: 560px; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  background: var(--panel);
+  box-shadow: 0 2px 8px #0006;
+  flex-wrap: wrap;
+}
+#topbar h1 { font-size: 1.2rem; margin: 0; color: var(--gold); letter-spacing: 1px; }
+.hub-link {
+  color: #f2f2f2cc;
+  text-decoration: none;
+  font-size: 0.8rem;
+  background: #00000040;
+  padding: 5px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.hub-link:hover { background: #00000066; color: #fff; }
+#scores { display: flex; gap: 8px; }
+.score-pill {
+  background: #00000055;
+  border: 1px solid #ffffff33;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.score-pill .team-label { font-size: 0.7rem; opacity: 0.8; }
+.score-pill span:last-child { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+#new-game-btn { margin-left: auto; }
+
+button {
+  background: var(--gold);
+  color: #2a1e00;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: scale(0.96); }
+
+#table {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  width: min(90vw, 360px);
+  height: min(90vw, 360px);
+}
+
+.cell {
+  background: #ffffff0f;
+  border: 1px solid #ffffff22;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  user-select: none;
+}
+.cell.clickable:hover { background: #ffffff22; }
+.cell.x { color: var(--x-color); }
+.cell.o { color: var(--o-color); }
+.cell.win { background: #e8c46933; outline: 2px solid var(--gold); }
+
+#controls {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--panel);
+}
+.control-msg { font-size: 0.95rem; opacity: 0.9; }

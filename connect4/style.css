@@ -1,0 +1,118 @@
+:root {
+  --gold: #e8c469;
+  --panel: #0d1b33ee;
+  --red: #e5453f;
+  --yellow: #f0c419;
+  --cell: 58px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(ellipse at center, #16294d 0%, #060f1f 100%);
+  color: #f2f2f2;
+}
+
+#app { display: flex; flex-direction: column; height: 100vh; min-height: 580px; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  background: var(--panel);
+  box-shadow: 0 2px 8px #0006;
+  flex-wrap: wrap;
+}
+#topbar h1 { font-size: 1.2rem; margin: 0; color: var(--gold); letter-spacing: 1px; }
+.hub-link {
+  color: #f2f2f2cc;
+  text-decoration: none;
+  font-size: 0.8rem;
+  background: #00000040;
+  padding: 5px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.hub-link:hover { background: #00000066; color: #fff; }
+#scores { display: flex; gap: 8px; }
+.score-pill {
+  background: #00000055;
+  border: 1px solid #ffffff33;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.score-pill .team-label { font-size: 0.7rem; opacity: 0.8; }
+.score-pill span:last-child { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+#new-game-btn { margin-left: auto; }
+
+button {
+  background: var(--gold);
+  color: #2a1e00;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: scale(0.96); }
+
+#table { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: auto; }
+
+#board-wrap { display: inline-block; }
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(7, var(--cell));
+  grid-template-rows: repeat(6, var(--cell));
+  gap: 6px;
+  background: linear-gradient(160deg, #2a5fc9, #1b3f96);
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px #0008;
+}
+
+.cell {
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 50%;
+  background: #0a1730;
+  cursor: pointer;
+  position: relative;
+  box-shadow: inset 0 2px 4px #00000088;
+}
+.cell.col-hover { background: #142654; }
+.cell .piece {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  box-shadow: inset 0 -4px 8px #00000033, 0 2px 3px #0006;
+}
+.cell .piece.r { background: radial-gradient(circle at 35% 30%, #ff7a72, var(--red)); }
+.cell .piece.y { background: radial-gradient(circle at 35% 30%, #ffe27a, var(--yellow)); }
+.cell.win .piece { outline: 3px solid #fff; }
+
+#controls {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--panel);
+}
+.control-msg { font-size: 0.95rem; opacity: 0.9; }
+
+@media (max-width: 640px) {
+  :root { --cell: 40px; }
+  #topbar h1 { display: none; }
+  #board { gap: 4px; padding: 6px; }
+}
