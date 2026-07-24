@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Euchre</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🂡</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <h1>Euchre</h1>
+    <div id="scoreboard">
+      <div class="score-pill"><span class="team-label">You</span><span id="score-you">0</span></div>
+      <div class="score-pill"><span class="team-label">Opp</span><span id="score-them">0</span></div>
+    </div>
+    <div id="dealer-indicator"></div>
+    <div id="trump-indicator"></div>
+    <button id="new-game-btn">New Game</button>
+  </header>
+
+  <div id="table">
+    <div class="seat seat-north">
+      <div class="seat-label" id="label-2">Partner</div>
+      <div class="hand hand-ai" id="hand-2"></div>
+    </div>
+    <div class="seat seat-west">
+      <div class="seat-label" id="label-1">West</div>
+      <div class="hand hand-ai vertical" id="hand-1"></div>
+    </div>
+    <div class="seat seat-center">
+      <div id="kitty-area" class="kitty-area"></div>
+      <div class="trick-area">
+        <div class="trick-spot trick-spot-north" id="trick-2"></div>
+        <div class="trick-spot trick-spot-west" id="trick-1"></div>
+        <div class="trick-spot trick-spot-east" id="trick-3"></div>
+        <div class="trick-spot trick-spot-south" id="trick-0"></div>
+      </div>
+    </div>
+    <div class="seat seat-east">
+      <div class="seat-label" id="label-3">East</div>
+      <div class="hand hand-ai vertical" id="hand-3"></div>
+    </div>
+    <div class="seat seat-south">
+      <div class="seat-label" id="label-0">You</div>
+      <div class="hand hand-human" id="hand-0"></div>
+    </div>
+  </div>
+
+  <div id="controls"></div>
+  <div id="log"></div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
