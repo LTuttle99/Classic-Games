@@ -12,8 +12,9 @@ function resizeCanvases() {
   for (const c of [canvas(), nextCanvas()]) {
     const rect = c.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    c.width = Math.round(rect.width * dpr);
-    c.height = Math.round(rect.height * dpr);
+    const w = Math.round(rect.width * dpr);
+    const h = Math.round(rect.height * dpr);
+    if (w > 0 && h > 0 && (c.width !== w || c.height !== h)) { c.width = w; c.height = h; }
   }
 }
 
@@ -47,10 +48,10 @@ function draw() {
     const gr = ghostRow(game);
     if (gr !== null) {
       ctx.globalAlpha = 0.25;
-      forEachCell(p, (r, c2) => { if (gr + r >= 0) drawCell(ctx, c2 * cell, (gr + r) * cell, cell, COLORS[p.type]); });
+      forEachCell(p, (r, c2) => { if (gr + r >= 0) drawCell(ctx, (p.col + c2) * cell, (gr + r) * cell, cell, COLORS[p.type]); });
       ctx.globalAlpha = 1;
     }
-    forEachCell(p, (r, c2) => { if (p.row + r >= 0) drawCell(ctx, c2 * cell, (p.row + r) * cell, cell, COLORS[p.type]); });
+    forEachCell(p, (r, c2) => { if (p.row + r >= 0) drawCell(ctx, (p.col + c2) * cell, (p.row + r) * cell, cell, COLORS[p.type]); });
   }
 
   const nc = nextCanvas();
@@ -80,6 +81,8 @@ function loop(now) {
   if (lastTime === null) lastTime = now;
   const dt = now - lastTime;
   lastTime = now;
+
+  resizeCanvases();
 
   if (!game.over) {
     acc += dt;
@@ -133,6 +136,46 @@ const KEY_ACTIONS = {
   ' ': doDrop,
 };
 
+// Binds a control button so it fires immediately on press and then auto-repeats
+// while held — plain `click` alone makes directional movement painfully slow on
+// touch. Pointer events are the primary path (works for mouse, touch, and pen in
+// one listener), with a `click` fallback guarded against double-firing, in case
+// some environment doesn't dispatch pointer events the way a real browser does.
+function bindHold(el, action, { delay = 220, interval = 80 } = {}) {
+  let timer = null;
+  let handledByPointer = false;
+  const stop = () => { if (timer) { clearTimeout(timer); timer = null; } };
+  el.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (el.setPointerCapture) { try { el.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
+    handledByPointer = true;
+    action();
+    stop();
+    timer = setTimeout(function repeat() {
+      action();
+      timer = setTimeout(repeat, interval);
+    }, delay);
+  });
+  el.addEventListener('pointerup', stop);
+  el.addEventListener('pointerleave', stop);
+  el.addEventListener('pointercancel', stop);
+  el.addEventListener('click', () => {
+    if (handledByPointer) { handledByPointer = false; return; }
+    action();
+  });
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+
+function bindTap(el, action) {
+  let handledByPointer = false;
+  el.addEventListener('pointerdown', e => { e.preventDefault(); handledByPointer = true; action(); });
+  el.addEventListener('click', () => {
+    if (handledByPointer) { handledByPointer = false; return; }
+    action();
+  });
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
+
 function boot() {
   resizeCanvases();
   window.addEventListener('resize', resizeCanvases);
@@ -145,12 +188,12 @@ function boot() {
     action();
   });
 
-  $('#btn-left').addEventListener('click', doLeft);
-  $('#btn-right').addEventListener('click', doRight);
-  $('#btn-down').addEventListener('click', doStep);
-  $('#btn-rotate').addEventListener('click', doRotate);
-  $('#btn-drop').addEventListener('click', doDrop);
-  $('#new-game-btn').addEventListener('click', restart);
+  bindHold($('#btn-left'), doLeft);
+  bindHold($('#btn-right'), doRight);
+  bindHold($('#btn-down'), doStep, { delay: 120, interval: 50 });
+  bindTap($('#btn-rotate'), doRotate);
+  bindTap($('#btn-drop'), doDrop);
+  bindTap($('#new-game-btn'), restart);
 
   requestAnimationFrame(loop);
 }
