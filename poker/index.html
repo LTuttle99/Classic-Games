@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Texas Hold'em</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🂮</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="hub-link" href="../">&larr; Games</a>
+    <h1>Hold'em</h1>
+    <div id="stacks"></div>
+    <button id="new-game-btn">Reset Stacks</button>
+  </header>
+
+  <div id="table">
+    <div class="seat seat-north">
+      <div class="seat-label" id="label-2">North</div>
+      <div class="hand" id="hand-2"></div>
+      <div class="bet-chip" id="bet-2"></div>
+    </div>
+    <div class="seat seat-west">
+      <div class="seat-label" id="label-1">West</div>
+      <div class="hand" id="hand-1"></div>
+      <div class="bet-chip" id="bet-1"></div>
+    </div>
+    <div class="seat seat-center">
+      <div id="pot-display"></div>
+      <div class="hand" id="community"></div>
+      <div id="street-label"></div>
+    </div>
+    <div class="seat seat-east">
+      <div class="seat-label" id="label-3">East</div>
+      <div class="hand" id="hand-3"></div>
+      <div class="bet-chip" id="bet-3"></div>
+    </div>
+    <div class="seat seat-south">
+      <div class="bet-chip" id="bet-0"></div>
+      <div class="hand" id="hand-0"></div>
+      <div class="seat-label" id="label-0">You</div>
+    </div>
+  </div>
+
+  <div id="controls"></div>
+  <div id="log"></div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

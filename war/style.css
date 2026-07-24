@@ -1,0 +1,164 @@
+:root {
+  --gold: #e8c469;
+  --panel: #123a2aee;
+  --card-w: 70px;
+  --card-h: 98px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(ellipse at center, #0e6b3d 0%, #063620 100%);
+  color: #f2f2f2;
+}
+
+#app { display: flex; flex-direction: column; height: 100vh; min-height: 600px; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: var(--panel);
+  box-shadow: 0 2px 8px #0006;
+  flex-wrap: wrap;
+}
+#topbar h1 { font-size: 1.2rem; margin: 0; color: var(--gold); letter-spacing: 1px; }
+.hub-link {
+  color: #f2f2f2cc;
+  text-decoration: none;
+  font-size: 0.8rem;
+  background: #00000040;
+  padding: 5px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.hub-link:hover { background: #00000066; color: #fff; }
+#counts { display: flex; gap: 8px; }
+.score-pill {
+  background: #00000055;
+  border: 1px solid #ffffff33;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+.score-pill .team-label { font-size: 0.7rem; opacity: 0.8; }
+.score-pill span:last-child { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+.auto-label { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; }
+#new-game-btn { margin-left: auto; }
+
+button {
+  background: var(--gold);
+  color: #2a1e00;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: scale(0.96); }
+button:disabled { opacity: 0.5; cursor: default; }
+
+#table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  gap: 12px;
+  min-height: 0;
+}
+
+.pile-area { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.pile-label { font-size: 0.8rem; opacity: 0.85; background: #00000040; padding: 2px 10px; border-radius: 10px; }
+.pile-back {
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: 8px;
+  background: repeating-linear-gradient(45deg, #1b4d8f, #1b4d8f 6px, #16407a 6px, #16407a 12px);
+  border: 1px solid #ffffff33;
+  box-shadow: 0 2px 6px #0006;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.battlefield {
+  flex: 1;
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  position: relative;
+}
+
+.card {
+  width: var(--card-w);
+  height: var(--card-h);
+  background: #fdfdf6;
+  border-radius: 7px;
+  border: 1px solid #0003;
+  box-shadow: 0 2px 4px #0005;
+  position: relative;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+.card.black { color: #1b1b1b; }
+.card.red { color: #c62828; }
+.card.card-back {
+  background: repeating-linear-gradient(45deg, #1b4d8f, #1b4d8f 6px, #16407a 6px, #16407a 12px);
+  border: 1px solid #ffffff33;
+}
+.card .corner { position: absolute; font-size: 0.8rem; line-height: 1; text-align: center; }
+.card .corner.top { top: 5px; left: 5px; }
+.card .corner.bottom { bottom: 5px; right: 5px; transform: rotate(180deg); }
+.card .pip { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.9rem; opacity: 0.85; }
+
+.war-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.war-group .stack { position: relative; width: var(--card-w); height: var(--card-h); }
+.war-group .stack .card { position: absolute; top: 0; left: 0; }
+.war-group .stack .card:nth-child(2) { top: 4px; left: 4px; }
+.war-group .stack .card:nth-child(3) { top: 8px; left: 8px; }
+.war-group .stack .card:nth-child(4) { top: 12px; left: 12px; }
+.war-tag { font-size: 0.65rem; opacity: 0.7; }
+
+#controls {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--panel);
+  flex-wrap: wrap;
+}
+.control-msg { font-size: 0.95rem; opacity: 0.9; margin-right: 6px; }
+
+#log {
+  height: 96px;
+  overflow-y: auto;
+  background: #00000066;
+  font-size: 0.78rem;
+  padding: 6px 16px;
+  line-height: 1.4;
+  border-top: 1px solid #ffffff22;
+}
+
+@media (max-width: 640px) {
+  :root { --card-w: 52px; --card-h: 74px; }
+  #topbar h1 { display: none; }
+}

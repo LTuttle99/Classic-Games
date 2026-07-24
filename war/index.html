@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>War</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🂾</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="hub-link" href="../">&larr; Games</a>
+    <h1>War</h1>
+    <div id="counts">
+      <div class="score-pill"><span class="team-label">You</span><span id="count-player">26</span></div>
+      <div class="score-pill"><span class="team-label">Opp</span><span id="count-cpu">26</span></div>
+    </div>
+    <label class="auto-label"><input type="checkbox" id="auto-toggle"> Auto-play</label>
+    <button id="new-game-btn">New Game</button>
+  </header>
+
+  <div id="table">
+    <div class="pile-area">
+      <div class="pile-label">Opponent</div>
+      <div class="pile-back" id="cpu-pile"></div>
+    </div>
+
+    <div class="battlefield" id="battlefield"></div>
+
+    <div class="pile-area">
+      <div class="pile-label">You</div>
+      <div class="pile-back" id="player-pile"></div>
+    </div>
+  </div>
+
+  <div id="controls"></div>
+  <div id="log"></div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Solitaire</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🂭</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="hub-link" href="../">&larr; Games</a>
+    <h1>Solitaire</h1>
+    <div class="score-pill"><span class="team-label">Moves</span><span id="moves">0</span></div>
+    <button id="hint-btn" title="Highlight one legal move">Hint</button>
+    <button id="auto-btn">Auto Finish</button>
+    <button id="new-game-btn">New Game</button>
+  </header>
+
+  <div id="table">
+    <div id="top-row">
+      <div class="pile" id="stock-pile"></div>
+      <div class="pile" id="waste-pile"></div>
+      <div class="spacer"></div>
+      <div class="pile foundation" id="foundation-S" data-suit="S"></div>
+      <div class="pile foundation" id="foundation-H" data-suit="H"></div>
+      <div class="pile foundation" id="foundation-D" data-suit="D"></div>
+      <div class="pile foundation" id="foundation-C" data-suit="C"></div>
+    </div>
+    <div id="tableau-row">
+      <div class="tableau-col" id="col-0"></div>
+      <div class="tableau-col" id="col-1"></div>
+      <div class="tableau-col" id="col-2"></div>
+      <div class="tableau-col" id="col-3"></div>
+      <div class="tableau-col" id="col-4"></div>
+      <div class="tableau-col" id="col-5"></div>
+      <div class="tableau-col" id="col-6"></div>
+    </div>
+  </div>
+
+  <div id="controls"></div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
