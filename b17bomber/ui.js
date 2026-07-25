@@ -68,6 +68,110 @@ function setSoundOn(on) {
   $('#sound-btn').textContent = on ? '\u{1F50A}' : '\u{1F507}';
 }
 
+/* ---------------------- visual effects: particles, shake, flash, vignette ---------------------- */
+
+let particles = [];
+let shakeTime = 0, shakeMag = 0;
+let flashAlpha = 0;
+const explodedTargetIds = new Set();
+
+function spawnBurst(x, y, opts) {
+  const { count = 16, colors = ['#ffcf6e', '#ff8a3c', '#ff4a2c'], speed = [60, 220], size = [2, 5], life = [0.35, 0.7], gravity = 0 } = opts;
+  for (let i = 0; i < count; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const spd = rand(speed[0], speed[1]);
+    const lifeVal = rand(life[0], life[1]);
+    particles.push({
+      x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      size: rand(size[0], size[1]), color: colors[Math.floor(Math.random() * colors.length)],
+      life: lifeVal, maxLife: lifeVal, gravity,
+    });
+  }
+}
+
+function triggerShake(mag, dur = 0.25) {
+  shakeMag = Math.max(shakeMag, mag);
+  shakeTime = Math.max(shakeTime, dur);
+}
+
+function triggerFlash(alpha) { flashAlpha = Math.max(flashAlpha, alpha); }
+
+function updateEffects(dt) {
+  for (const p of particles) {
+    p.vy += p.gravity * dt;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    p.life -= dt;
+  }
+  particles = particles.filter(p => p.life > 0);
+  if (shakeTime > 0) { shakeTime -= dt; if (shakeTime <= 0) shakeMag = 0; }
+  if (flashAlpha > 0) flashAlpha = Math.max(0, flashAlpha - dt * 3);
+}
+
+function drawParticles(ctx) {
+  for (const p of particles) {
+    const a = Math.max(0, p.life / p.maxLife);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size * (0.5 + a * 0.5), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawDamageVignette(ctx, c) {
+  const dmg = 1 - clamp(game.hp / HP_START, 0, 1);
+  if (dmg <= 0) return;
+  const grad = ctx.createRadialGradient(c.width / 2, c.height / 2, c.height * 0.25, c.width / 2, c.height / 2, c.height * 0.7);
+  grad.addColorStop(0, 'rgba(180,0,0,0)');
+  grad.addColorStop(1, `rgba(180,0,0,${(dmg * 0.55).toFixed(2)})`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, c.width, c.height);
+}
+
+function drawFlash(ctx, c) {
+  if (flashAlpha <= 0) return;
+  ctx.fillStyle = `rgba(255,80,60,${flashAlpha.toFixed(2)})`;
+  ctx.fillRect(0, 0, c.width, c.height);
+}
+
+function drawMuzzleFlash(ctx, c) {
+  if (!game.input.fire) return;
+  const rx = screenX(c, game.gunReticle);
+  const ry = c.height * 0.4;
+  const gunX = c.width / 2, gunY = c.height * 0.95;
+  const grad = ctx.createLinearGradient(gunX, gunY, rx, ry);
+  grad.addColorStop(0, 'rgba(255,230,150,0.9)');
+  grad.addColorStop(1, 'rgba(255,230,150,0)');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2 + Math.random() * 1.5;
+  ctx.beginPath(); ctx.moveTo(gunX, gunY); ctx.lineTo(rx, ry); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,220,120,0.9)';
+  ctx.beginPath(); ctx.arc(gunX, gunY, 6 + Math.random() * 3, 0, Math.PI * 2); ctx.fill();
+}
+
+// Ground explosion the moment a target is destroyed — scans once per frame,
+// each target fires its burst exactly once via explodedTargetIds.
+function checkTargetExplosions(c) {
+  for (const t of game.targets) {
+    if (!t.destroyed || explodedTargetIds.has(t.id)) continue;
+    explodedTargetIds.add(t.id);
+    if (game.view !== 'bombardier') continue;
+    const rd = t.distance - game.distance;
+    if (rd < -200 || rd > VIEW_RANGE + 100) continue;
+    const frac = Math.max(0, Math.min(1, rd / VIEW_RANGE));
+    const y = c.height * (0.92 - frac * 0.8);
+    const x = screenX(c, t.lateral);
+    spawnBurst(x, y, { count: 26, colors: ['#ffcf6e', '#ff8a3c', '#c23b1e', '#3a3a3a'], speed: [40, 180], size: [3, 7], life: [0.4, 0.9], gravity: 40 });
+    triggerShake(4, 0.2);
+  }
+}
+
+function captureFighterScreenState(c) {
+  return game.fighters.map(f => {
+    const closeness = 1 - f.closing;
+    return { id: f.id, x: screenX(c, f.lateral), y: c.height * (0.4 - closeness * 0.05) };
+  });
+}
+
 /* ---------------------------------------- rendering ---------------------------------------- */
 
 function resizeCanvas() {
@@ -256,6 +360,7 @@ function drawGunner(ctx, c) {
   }
 
   drawGunReticle(ctx, c);
+  drawMuzzleFlash(ctx, c);
   drawCockpitFrame(ctx, c, 'gunner');
 }
 
@@ -296,8 +401,14 @@ function drawCockpitFrame(ctx, c, mode) {
 function draw() {
   const c = canvas();
   const ctx = c.getContext('2d');
+  ctx.save();
+  if (shakeMag > 0) ctx.translate((Math.random() - 0.5) * shakeMag * 2, (Math.random() - 0.5) * shakeMag * 2);
   if (game.view === 'bombardier') drawBombardier(ctx, c);
   else drawGunner(ctx, c);
+  drawParticles(ctx);
+  drawDamageVignette(ctx, c);
+  drawFlash(ctx, c);
+  ctx.restore();
 }
 
 /* ------------------------------------------- HUD ------------------------------------------- */
@@ -339,20 +450,58 @@ function snapshot() {
   };
 }
 
-function playTransitionSounds(before, after) {
+function playTransitionFeedback(before, after, prevFighterScreenState) {
+  const c = canvas();
+  const fighterKilledThisFrame = after.score > before.score && after.destroyedCount === before.destroyedCount && after.fighterCount <= before.fighterCount;
+
   if (after.destroyedCount > before.destroyedCount) SFX.hitTarget();
-  if (after.lastFlakHit !== before.lastFlakHit) SFX.flak();
-  if (after.lastEngineHit !== before.lastEngineHit) SFX.engineHit();
-  if (after.score > before.score && after.destroyedCount === before.destroyedCount) {
-    // score jumped without a new target destroyed this frame -> a fighter kill
-    if (after.fighterCount <= before.fighterCount) SFX.fighterKill();
+  checkTargetExplosions(c);
+
+  if (after.lastFlakHit !== before.lastFlakHit) {
+    SFX.flak();
+    for (let i = 0; i < 2; i++) {
+      spawnBurst(rand(c.width * 0.2, c.width * 0.8), rand(c.height * 0.1, c.height * 0.5),
+        { count: 14, colors: ['#444', '#666', '#888', '#ddd'], speed: [15, 60], size: [3, 7], life: [0.5, 1.0], gravity: -15 });
+    }
+    triggerShake(6, 0.25);
+    triggerFlash(0.22);
   }
-  if (after.fighterCount < before.fighterCount && after.score === before.score) SFX.planeHit();
+
+  if (after.lastEngineHit !== before.lastEngineHit) {
+    SFX.engineHit();
+    spawnBurst(c.width * 0.15, c.height * 0.9, { count: 10, colors: ['#888', '#666', '#333'], speed: [20, 70], size: [2, 4], life: [0.3, 0.6], gravity: -20 });
+    triggerShake(3, 0.15);
+  }
+
+  if (fighterKilledThisFrame) SFX.fighterKill();
+
+  const afterIds = new Set(game.fighters.map(f => f.id));
+  for (const v of prevFighterScreenState) {
+    if (afterIds.has(v.id)) continue;
+    if (fighterKilledThisFrame) {
+      spawnBurst(v.x, v.y, { count: 22, colors: ['#ffe08a', '#ff8a3c', '#ff4a2c', '#555'], speed: [50, 200], size: [2, 6], life: [0.3, 0.6] });
+      triggerShake(3, 0.15);
+    } else {
+      SFX.planeHit();
+      triggerFlash(0.35);
+      triggerShake(8, 0.3);
+    }
+  }
+
   if (!before.gunLocked && after.gunLocked) SFX.overheat();
+
   if (!before.over && after.over) {
-    if (game.win) SFX.missionWin();
-    else if (game.crashed) SFX.crashed();
-    else SFX.shotDown();
+    if (game.win) {
+      SFX.missionWin();
+    } else if (game.crashed) {
+      SFX.crashed();
+      spawnBurst(c.width / 2, c.height / 2, { count: 40, colors: ['#ffcf6e', '#ff8a3c', '#c23b1e', '#3a3a3a'], speed: [40, 260], size: [3, 9], life: [0.6, 1.3], gravity: 30 });
+      triggerShake(14, 0.6);
+    } else {
+      SFX.shotDown();
+      triggerFlash(0.5);
+      triggerShake(10, 0.5);
+    }
   }
 }
 
@@ -367,6 +516,7 @@ function loop(now) {
 
   if (game.briefingDone && !game.over) {
     if (prev === null) prev = snapshot();
+    const prevFighterScreenState = captureFighterScreenState(canvas());
     update(game, dt);
     if (game.view === 'gunner' && game.input.fire && !game.gunLocked) {
       gunFireTimer -= dt;
@@ -375,11 +525,12 @@ function loop(now) {
       gunFireTimer = 0;
     }
     const after = snapshot();
-    playTransitionSounds(prev, after);
+    playTransitionFeedback(prev, after, prevFighterScreenState);
     prev = after;
     updateHud();
     if (game.over) showEndOverlay();
   }
+  updateEffects(dt);
   draw();
   requestAnimationFrame(loop);
 }
@@ -446,6 +597,9 @@ function showEndOverlay() {
 function restart() {
   game = newGame();
   prev = null;
+  particles = [];
+  shakeTime = 0; shakeMag = 0; flashAlpha = 0;
+  explodedTargetIds.clear();
   $('#overlay').classList.remove('show');
   updateHud();
   showBriefing();
