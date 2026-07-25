@@ -247,12 +247,18 @@ function updateFlak(game, dt) {
 }
 
 function spawnFighter(game) {
+  const baseLateral = rand(-0.9, 0.9);
   game.fighters.push({
-    id: nextId(), lateral: rand(-0.9, 0.9), closing: 1, hp: FIGHTER_HP,
+    id: nextId(), baseLateral, lateral: baseLateral, weaveVel: 0, closing: 1, hp: FIGHTER_HP,
     approachTime: rand(FIGHTER_APPROACH_TIME[0], FIGHTER_APPROACH_TIME[1]),
+    weaveAmp: rand(0.18, 0.4), weaveFreq: rand(0.5, 1.15), weavePhase: rand(0, Math.PI * 2),
   });
 }
 
+// Fighters weave side to side while approaching (searching for a firing
+// line), then settle onto a straighter run as they commit to the attack
+// close-in — real, gameplay-relevant movement rather than a fixed lateral
+// slot that only grows in size.
 function updateFighters(game, dt) {
   game.fighterSpawnTimer -= dt;
   if (game.fighterSpawnTimer <= 0) {
@@ -261,6 +267,11 @@ function updateFighters(game, dt) {
   }
   for (const f of game.fighters) {
     f.closing -= dt / f.approachTime;
+    const t = game.elapsed * f.weaveFreq * Math.PI * 2 + f.weavePhase;
+    const envelope = Math.max(0, f.closing); // weave dies out as it commits to the run
+    const offset = Math.sin(t) * f.weaveAmp * envelope;
+    f.weaveVel = Math.cos(t) * f.weaveAmp * envelope * f.weaveFreq * Math.PI * 2;
+    f.lateral = clamp(f.baseLateral + offset, -1.15, 1.15);
     if (f.closing <= 0) {
       f.dead = true;
       game.hp -= rand(FIGHTER_DMG[0], FIGHTER_DMG[1]);

@@ -132,8 +132,15 @@ function drawBombardier(ctx, c) {
     const frac = Math.max(0, Math.min(1, rd / VIEW_RANGE));
     const y = c.height * (0.92 - frac * 0.8);
     const x = screenX(c, b.lateral);
+    const r = Math.max(2, c.width * 0.012 * (1 + progress));
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(progress * 9); // tumbling as it falls
     ctx.fillStyle = '#222';
-    ctx.beginPath(); ctx.arc(x, y, Math.max(2, c.width * 0.012 * (1 + progress)), 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(0, 0, r * 0.6, r * 1.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
   drawBombsight(ctx, c);
@@ -152,15 +159,19 @@ function drawBombsight(ctx, c) {
   ctx.beginPath(); ctx.moveTo(cx, cy - 34); ctx.lineTo(cx, cy - 24); ctx.stroke();
 }
 
-// Fighter silhouette with wings, canopy, and shading — approaching head-on,
-// so it grows and fills more of the frame the closer it gets.
+// Fighter silhouette with wings, canopy, and shading — approaching head-on
+// while weaving, so it grows the closer it gets and banks into its turns
+// like a real aircraft rather than sitting dead-center.
 function drawFighter(ctx, x, y, size, f) {
   ctx.save();
   ctx.translate(x, y);
+  const bank = clamp(f.weaveVel * 0.9, -0.5, 0.5);
+  ctx.rotate(bank);
 
-  // engine glow trail
-  ctx.fillStyle = 'rgba(255,160,80,0.35)';
-  ctx.beginPath(); ctx.ellipse(0, size * 0.55, size * 0.1, size * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+  // engine glow trail, flickering
+  const flicker = 0.28 + Math.random() * 0.14;
+  ctx.fillStyle = `rgba(255,160,80,${flicker.toFixed(2)})`;
+  ctx.beginPath(); ctx.ellipse(0, size * (0.55 + Math.random() * 0.04), size * 0.1, size * 0.22, 0, 0, Math.PI * 2); ctx.fill();
 
   // wings (swept trapezoid)
   const wingGrad = ctx.createLinearGradient(-size * 0.7, 0, size * 0.7, 0);
@@ -299,7 +310,6 @@ function updateHud() {
   $('#hp').textContent = Math.round(game.hp);
   $('#bombs').textContent = game.bombsLeft;
   $('#viewLabel').textContent = game.view === 'bombardier' ? 'BOMBARDIER' : 'GUNNER';
-  $('#btn-action').textContent = game.view === 'bombardier' ? 'Drop Bomb' : 'Fire';
   const objInfo = game.primaryType ? TARGET_TYPES[game.primaryType] : null;
   $('#objective').textContent = objInfo ? `${objInfo.icon} ${objInfo.name}` : '—';
   $('#engines-icons').textContent = game.engines.map(s => ENGINE_ICON[s]).join('');
@@ -470,15 +480,25 @@ const KEY_MAP = {
   ArrowRight: 'aimRight', d: 'aimRight', D: 'aimRight',
 };
 
-function doAction() {
+// A tap/click (press+release with little movement, no held button) fires
+// or drops a bomb right where you're aimed; a drag only repositions aim
+// so adjusting your reticle never accidentally triggers a shot.
+let burstTimer = null;
+function performTapAction() {
   if (!game.briefingDone || game.over) return;
   if (game.view === 'bombardier') { if (dropBomb(game)) SFX.dropBomb(); }
-  else setInput(game, { fire: true });
+  else {
+    setInput(game, { fire: true });
+    if (burstTimer) clearTimeout(burstTimer);
+    burstTimer = setTimeout(() => setInput(game, { fire: false }), 90);
+  }
 }
 
 // Mouse tracks aim continuously on hover; touch requires a drag (no hover
 // on touch), both via the unified Pointer Events API.
 let pointerDown = false;
+let dragStartX = 0, dragStartY = 0, dragStartTime = 0, didDrag = false;
+const TAP_MOVE_THRESHOLD = 10, TAP_TIME_THRESHOLD = 400;
 function aimFromEvent(e) {
   const c = canvas();
   const rect = c.getBoundingClientRect();
@@ -487,16 +507,24 @@ function aimFromEvent(e) {
   setAim(game, lateral);
 }
 function onCanvasPointerMove(e) {
-  if (e.pointerType === 'mouse' || pointerDown) aimFromEvent(e);
+  if (e.pointerType === 'mouse' || pointerDown) {
+    aimFromEvent(e);
+    if (pointerDown && Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY) > TAP_MOVE_THRESHOLD) didDrag = true;
+  }
 }
 function onCanvasPointerDown(e) {
   e.preventDefault();
   pointerDown = true;
+  didDrag = false;
+  dragStartX = e.clientX; dragStartY = e.clientY; dragStartTime = performance.now();
   aimFromEvent(e);
   const c = canvas();
   if (c.setPointerCapture) { try { c.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
 }
-function onCanvasPointerUp() { pointerDown = false; }
+function onCanvasPointerUp() {
+  pointerDown = false;
+  if (!didDrag && performance.now() - dragStartTime < TAP_TIME_THRESHOLD) performTapAction();
+}
 
 function boot() {
   resizeCanvas();
@@ -513,7 +541,7 @@ function boot() {
 
   const keyHeld = {};
   document.addEventListener('keydown', e => {
-    if (e.key === ' ') { e.preventDefault(); doAction(); return; }
+    if (e.key === ' ') { e.preventDefault(); performTapAction(); return; }
     if (e.key === 'v' || e.key === 'V' || e.key === 'Tab') { e.preventDefault(); toggleView(game); updateHud(); return; }
     if (e.key === 'q' || e.key === 'Q') { e.preventDefault(); setInput(game, { throttleDown: true }); return; }
     if (e.key === 'e' || e.key === 'E') { e.preventDefault(); setInput(game, { throttleUp: true }); return; }
@@ -538,17 +566,6 @@ function boot() {
   bindHold($('#btn-aim-right'), 'aimRight');
   bindHold($('#btn-throttle-up'), 'throttleUp');
   bindHold($('#btn-throttle-down'), 'throttleDown');
-
-  const actionBtn = $('#btn-action');
-  let firingHeld = false;
-  actionBtn.addEventListener('pointerdown', e => {
-    e.preventDefault();
-    if (!game.briefingDone || game.over) return;
-    if (game.view === 'bombardier') { if (dropBomb(game)) SFX.dropBomb(); }
-    else { firingHeld = true; setInput(game, { fire: true }); }
-  });
-  actionBtn.addEventListener('pointerup', () => { if (firingHeld) { firingHeld = false; setInput(game, { fire: false }); } });
-  actionBtn.addEventListener('pointerleave', () => { if (firingHeld) { firingHeld = false; setInput(game, { fire: false }); } });
 
   bindTap($('#btn-view'), () => { toggleView(game); updateHud(); });
   bindTap($('#new-game-btn'), restart);
