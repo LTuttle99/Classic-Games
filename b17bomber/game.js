@@ -34,6 +34,18 @@ const GUN_DPS = 2.4;
 const GUN_LATERAL_TOL = 0.28;
 const BEST_KEY = 'b17bomber-best';
 
+// Mission briefing: the player picks one of these as the primary objective
+// before takeoff. Hitting a primary-type target pays double, and clearing
+// every target of that type by mission's end pays a completion bonus.
+const TARGET_TYPES = {
+  factory: { value: 100, lateralMul: 1, icon: '🏭', name: 'Factory', desc: 'Standard industrial target.' },
+  bridge: { value: 150, lateralMul: 0.5, icon: '🌉', name: 'Bridge', desc: 'Narrow — precise timing required.' },
+  fuel_depot: { value: 130, lateralMul: 1, icon: '⛽', name: 'Fuel Depot', desc: 'Volatile stores, high value.' },
+  airfield: { value: 180, lateralMul: 0.85, icon: '🛩️', name: 'Airfield', desc: 'Heavily defended, highest value.' },
+};
+const PRIMARY_BONUS_MULT = 2;
+const PRIMARY_COMPLETE_BONUS = 300;
+
 function loadBest() { try { return parseInt(localStorage.getItem(BEST_KEY), 10) || 0; } catch (e) { return 0; } }
 function saveBest(n) { try { localStorage.setItem(BEST_KEY, String(n)); } catch (e) { /* ignore */ } }
 
@@ -42,18 +54,37 @@ function rand(min, max) { return min + Math.random() * (max - min); }
 let uid = 1;
 function nextId() { return uid++; }
 
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Guarantees at least one of every target type appears, so the briefing's
+// chosen objective is always actually present in the mission.
+function pickTargetTypes(n) {
+  const allTypes = Object.keys(TARGET_TYPES);
+  const list = allTypes.slice();
+  while (list.length < n) list.push(allTypes[Math.floor(Math.random() * allTypes.length)]);
+  return shuffle(list).slice(0, n);
+}
+
 function generateTargets() {
   const targets = [];
   const margin = 350;
   const usable = TRACK_LENGTH - margin * 2;
   const gap = usable / NUM_TARGETS;
+  const types = pickTargetTypes(NUM_TARGETS);
   for (let i = 0; i < NUM_TARGETS; i++) {
     targets.push({
       id: nextId(),
       distance: margin + gap * i + rand(-gap * 0.25, gap * 0.25),
       lateral: rand(-0.75, 0.75),
       destroyed: false,
-      value: 100,
+      type: types[i],
     });
   }
   return targets;
@@ -83,10 +114,30 @@ function newGame() {
     elapsed: 0,
     input: { altUp: false, altDown: false, aimLeft: false, aimRight: false, throttleUp: false, throttleDown: false, fire: false },
     lastFlakHit: 0,
+    briefingDone: false,
+    primaryType: null,
+    primaryObjectiveComplete: false,
   };
 }
 
 function setInput(game, partial) { Object.assign(game.input, partial); }
+
+// Pre-mission briefing: picks the primary objective type. The mission clock
+// (update()) is gated until this is called.
+function chooseTarget(game, type) {
+  if (!TARGET_TYPES[type] || game.briefingDone) return false;
+  game.primaryType = type;
+  game.briefingDone = true;
+  return true;
+}
+
+// Direct positional aim (mouse/touch drag) — sets whichever reticle is
+// active for the current view.
+function setAim(game, lateral) {
+  const clamped = clamp(lateral, -1, 1);
+  if (game.view === 'bombardier') game.aimLateral = clamped;
+  else game.gunReticle = clamped;
+}
 
 function toggleView(game) {
   if (game.over) return;
@@ -117,14 +168,19 @@ function resolveBomb(game, bomb) {
   let hitTarget = null;
   for (const t of game.targets) {
     if (t.destroyed) continue;
-    if (Math.abs(t.distance - bomb.impactDistance) <= HIT_WINDOW && Math.abs(t.lateral - bomb.lateral) <= LATERAL_HIT_WINDOW) {
+    const latWindow = LATERAL_HIT_WINDOW * TARGET_TYPES[t.type].lateralMul;
+    if (Math.abs(t.distance - bomb.impactDistance) <= HIT_WINDOW && Math.abs(t.lateral - bomb.lateral) <= latWindow) {
       hitTarget = t;
       break;
     }
   }
   if (hitTarget) {
     hitTarget.destroyed = true;
-    game.score += hitTarget.value;
+    const info = TARGET_TYPES[hitTarget.type];
+    const isPrimary = hitTarget.type === game.primaryType;
+    hitTarget.pointsAwarded = info.value * (isPrimary ? PRIMARY_BONUS_MULT : 1);
+    hitTarget.wasPrimary = isPrimary;
+    game.score += hitTarget.pointsAwarded;
   }
   return hitTarget;
 }
@@ -200,6 +256,9 @@ function finalizeIfOver(game) {
     game.hp = 0; game.over = true; game.win = false;
   } else if (game.distance >= TRACK_LENGTH) {
     game.distance = TRACK_LENGTH;
+    const primaryCleared = !game.targets.some(t => t.type === game.primaryType && !t.destroyed);
+    game.primaryObjectiveComplete = primaryCleared;
+    if (primaryCleared) game.score += PRIMARY_COMPLETE_BONUS;
     game.score += Math.round(game.hp * 2 + game.bombsLeft * 5);
     game.over = true; game.win = true;
   }
@@ -208,7 +267,7 @@ function finalizeIfOver(game) {
 
 function update(game, dt) {
   dt = Math.min(dt, 0.05);
-  if (game.over) return;
+  if (game.over || !game.briefingDone) return;
   game.elapsed += dt;
 
   if (game.input.throttleUp) game.throttle = clamp(game.throttle + THROTTLE_RATE * dt, 0, 1);

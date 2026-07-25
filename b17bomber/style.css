@@ -64,6 +64,22 @@ button {
 button:hover { filter: brightness(1.08); }
 button:active { transform: scale(0.96); }
 
+.icon-btn {
+  background: #ffffff18;
+  color: #f2f2f2;
+  border: 1px solid #ffffff33;
+  border-radius: 20px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn:hover { background: #ffffff2e; }
+.icon-btn.muted { opacity: 0.5; }
+
 #table { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; gap: 10px; min-height: 0; overflow: auto; }
 
 #board-wrap {
@@ -75,7 +91,7 @@ button:active { transform: scale(0.96); }
   box-shadow: 0 8px 24px #0008;
   overflow: hidden;
 }
-#canvas { width: 100%; height: 100%; display: block; }
+#canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
 
 #viewLabel {
   position: absolute;
@@ -108,6 +124,50 @@ button:active { transform: scale(0.96); }
 #overlay.show { display: flex; }
 #overlay .overlay-msg { font-size: 1.3rem; font-weight: 700; color: var(--gold); }
 #overlay .overlay-sub { font-size: 0.9rem; opacity: 0.8; margin-top: -6px; }
+#overlay .overlay-objective { font-size: 0.82rem; opacity: 0.85; }
+
+#briefing {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  background: #05070cd8;
+  text-align: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+#briefing.show { display: flex; }
+#briefing .briefing-title { font-size: 1.15rem; font-weight: 700; color: var(--gold); margin-bottom: 2px; }
+#briefing .briefing-sub { font-size: 0.78rem; opacity: 0.75; margin-bottom: 4px; }
+#briefing .briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+}
+.target-card {
+  background: #ffffff12;
+  border: 1px solid #ffffff33;
+  border-radius: 10px;
+  padding: 10px 8px;
+  color: #f2f2f2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.78rem;
+  text-align: center;
+}
+.target-card .target-icon { font-size: 1.6rem; }
+.target-card .target-name { font-weight: 700; color: var(--gold); font-size: 0.85rem; }
+.target-card .target-desc { opacity: 0.75; font-size: 0.7rem; line-height: 1.25; }
+.target-card .target-value { opacity: 0.9; font-size: 0.72rem; }
+.target-card:hover { background: #ffffff22; border-color: var(--gold); }
+.target-card:active { transform: scale(0.97); }
 
 #hint { font-size: 0.76rem; opacity: 0.6; margin: 0; text-align: center; }
 
@@ -119,7 +179,6 @@ button:active { transform: scale(0.96); }
   touch-action: none;
 }
 .ctl-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.ctl-row { display: flex; gap: 6px; }
 .ctl-center { gap: 8px; }
 .ctl-btn {
   min-width: 52px;
@@ -147,4 +206,5 @@ button:active { transform: scale(0.96); }
   .ctl-btn { min-width: 44px; height: 38px; font-size: 0.7rem; }
   .ctl-action { min-width: 90px; height: 46px; }
   #hint { font-size: 0.68rem; }
+  .briefing-grid { grid-template-columns: 1fr; max-width: 260px; }
 }

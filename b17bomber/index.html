@@ -17,7 +17,9 @@
       <div class="score-pill"><span class="team-label">Best</span><span id="best">0</span></div>
       <div class="score-pill"><span class="team-label">HP</span><span id="hp">100</span></div>
       <div class="score-pill"><span class="team-label">Bombs</span><span id="bombs">16</span></div>
+      <div class="score-pill" id="objective-pill"><span class="team-label">Target</span><span id="objective">—</span></div>
     </div>
+    <button class="icon-btn" id="sound-btn" title="Toggle sound">&#128266;</button>
     <button id="new-game-btn">Restart</button>
   </header>
 
@@ -25,16 +27,13 @@
     <div id="board-wrap">
       <canvas id="canvas"></canvas>
       <div id="overlay"></div>
+      <div id="briefing"></div>
       <div id="viewLabel">BOMBARDIER</div>
     </div>
 
     <div id="controls">
       <div class="ctl-col">
         <button class="ctl-btn" id="btn-alt-up" title="Climb">&#9650;ALT</button>
-        <div class="ctl-row">
-          <button class="ctl-btn" id="btn-aim-left">&larr;</button>
-          <button class="ctl-btn" id="btn-aim-right">&rarr;</button>
-        </div>
         <button class="ctl-btn" id="btn-alt-down" title="Dive">&#9660;ALT</button>
       </div>
       <div class="ctl-col ctl-center">
@@ -46,7 +45,7 @@
         <button class="ctl-btn" id="btn-throttle-down" title="Throttle down">THR&#9660;</button>
       </div>
     </div>
-    <p id="hint">Bombardier: aim + drop bombs, lead your target. Gunner: aim + fire on incoming fighters.</p>
+    <p id="hint">Move the mouse (or drag on touch) over the view to aim. Bombardier: lead your target before dropping. Gunner: track fighters and fire.</p>
   </div>
 </div>
 
