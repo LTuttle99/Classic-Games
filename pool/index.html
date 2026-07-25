@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>8-Ball Pool</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎱</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="hub-link" href="../">&larr; Games</a>
+    <h1>8-Ball Pool</h1>
+    <div id="scores">
+      <div class="score-pill"><span class="team-label">Wins</span><span id="wins">0</span></div>
+      <div class="score-pill" id="turn-pill"><span class="team-label">Turn</span><span id="turn">You</span></div>
+      <div class="score-pill" id="group-pill"><span class="team-label">You</span><span id="group">—</span></div>
+    </div>
+    <button id="new-game-btn">Restart</button>
+  </header>
+
+  <div id="table">
+    <div id="board-wrap">
+      <canvas id="canvas"></canvas>
+      <div id="banner"></div>
+      <div id="overlay"></div>
+    </div>
+    <p id="hint">Drag back from the cue ball and release to shoot — like a slingshot.</p>
+  </div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

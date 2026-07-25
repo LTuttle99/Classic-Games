@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Tower Defense</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏰</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="hub-link" href="../">&larr; Games</a>
+    <h1>Tower Defense</h1>
+    <div id="scores">
+      <div class="score-pill"><span class="team-label">Gold</span><span id="currency">150</span></div>
+      <div class="score-pill"><span class="team-label">Lives</span><span id="lives">20</span></div>
+      <div class="score-pill"><span class="team-label">Wave</span><span id="wave">0</span></div>
+      <div class="score-pill"><span class="team-label">Best</span><span id="best">0</span></div>
+    </div>
+    <button id="new-game-btn">Restart</button>
+  </header>
+
+  <div id="table">
+    <div id="board-wrap">
+      <canvas id="canvas"></canvas>
+      <div id="overlay"></div>
+    </div>
+
+    <div id="hud-row">
+      <button id="wave-btn">Start Wave</button>
+      <div id="selected-info"></div>
+    </div>
+
+    <div id="palette">
+      <button class="tower-btn" data-type="arrow">
+        <span class="tower-swatch swatch-arrow"></span>Arrow<span class="tower-cost">50g</span>
+      </button>
+      <button class="tower-btn" data-type="cannon">
+        <span class="tower-swatch swatch-cannon"></span>Cannon<span class="tower-cost">90g</span>
+      </button>
+      <button class="tower-btn" data-type="frost">
+        <span class="tower-swatch swatch-frost"></span>Frost<span class="tower-cost">70g</span>
+      </button>
+      <button class="tower-btn" data-type="sniper">
+        <span class="tower-swatch swatch-sniper"></span>Sniper<span class="tower-cost">130g</span>
+      </button>
+    </div>
+    <p id="hint">Pick a tower, tap an open tile to build. Tap a placed tower to upgrade it.</p>
+  </div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

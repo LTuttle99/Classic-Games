@@ -1,6 +1,6 @@
 # Game Arcade
 
-Eighteen classic games, each playable against AI (or solo). Pure HTML/CSS/JS,
+Twenty-three classic games, each playable against AI (or solo). Pure HTML/CSS/JS,
 no build step, no dependencies, no backend — everything runs client-side and
 deploys as static files.
 
@@ -38,6 +38,11 @@ Open `index.html` for a hub page linking to each game.
 | Snake | `snake/` | Grid-tick movement, on-screen D-pad + keyboard, speeds up as you grow |
 | Pong | `pong/` | Real-time physics, mouse/touch/keyboard paddle control, first to 7 |
 | Breakout | `breakout/` | Paddle + ball + bricks, mouse/touch/keyboard control, lives, level speed-up |
+| Pac-Man | `pacman/` | Maze, pellets, power pellets, 4 ghosts with distinct AI (chaser, ambusher, erratic, shy), chase/scatter/frightened modes |
+| Asteroids | `asteroids/` | Thrust/rotation/momentum physics, screen wrap, splitting asteroids, lives |
+| 8-Ball Pool | `pool/` | Multi-ball physics — friction, cushions, pockets — vs. an AI that evaluates real shots (angle/power) |
+| Tower Defense | `towerdefense/` | Enemies follow a fixed route, escalating waves, 4 tower types with upgrades, gold/lives economy |
+| B-17 Bomber | `b17bomber/` | Intellivision-style dual view — bombardier (lead your target, drop bombs) and gunner (shoot down fighters) |
 
 Each game is fully self-contained in its own folder (`index.html`, `style.css`,
 `game.js` for engine/AI, `ui.js` for rendering) — nothing is shared between
@@ -98,10 +103,23 @@ be found at the repo root.
 - **Chess**: no 50-move rule, no threefold-repetition draw, and AI always
   promotes to queen; a human player can still underpromote via the on-board
   picker. Depth-3 alpha-beta search — beatable, not a full engine.
-- **Chip balances** (Blackjack, Poker) and **best scores** (2048, Snake,
-  Tetris, Breakout) persist in the browser's `localStorage`, so they survive
-  a page reload but are local to that browser.
+- **8-Ball Pool**: no spin/english on the cue ball. A scratch (cue ball
+  potted) respots it at a fixed safe spot rather than true ball-in-hand
+  placement, and potting the 8-ball on the break is always a loss rather
+  than a re-rack.
+- **Tower Defense**: enemies follow one fixed serpentine route computed at
+  load, rather than dynamic pathfinding that reroutes around towers — towers
+  simply can't be placed on route tiles.
+- **B-17 Bomber**: altitude, flak risk, and bomb ballistics are an abstracted
+  arcade model (not real aerodynamics), tuned so leading a bomb release
+  ahead of the target is a real skill, not literal flight physics.
+- **Chip balances** (Blackjack, Poker), **best scores** (2048, Snake, Tetris,
+  Breakout, Pac-Man, Asteroids, B-17 Bomber), **best wave** (Tower Defense),
+  and **wins** (Pool) persist in the browser's `localStorage`, so they
+  survive a page reload but are local to that browser.
 - AI opponents in every game use hand-tuned heuristics or minimax search, not
   a single unified engine — Tic-Tac-Toe, Checkers, Connect Four, Othello, and
   Chess all use (alpha-beta) minimax and play quite strong; Euchre, Hold'em,
-  and UNO use scoring heuristics and are more beatable.
+  and UNO use scoring heuristics and are more beatable; Pool's AI evaluates
+  real shot geometry (ghost-ball angle, line-of-sight, required power) across
+  every target ball and pocket before picking the easiest feasible shot.

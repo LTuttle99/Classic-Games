@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Asteroids</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪨</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <a class="hub-link" href="../">&larr; Games</a>
+    <h1>Asteroids</h1>
+    <div id="scores">
+      <div class="score-pill"><span class="team-label">Score</span><span id="score">0</span></div>
+      <div class="score-pill"><span class="team-label">Best</span><span id="best">0</span></div>
+      <div class="score-pill"><span class="team-label">Lives</span><span id="lives">3</span></div>
+      <div class="score-pill"><span class="team-label">Wave</span><span id="wave">1</span></div>
+    </div>
+    <button id="new-game-btn">Restart</button>
+  </header>
+
+  <div id="table">
+    <div id="board-wrap">
+      <canvas id="canvas"></canvas>
+      <div id="overlay"></div>
+    </div>
+    <div id="controls">
+      <div class="ctl-group">
+        <button class="ctl-btn" id="btn-left">&#8634;</button>
+        <button class="ctl-btn" id="btn-right">&#8635;</button>
+      </div>
+      <div class="ctl-group">
+        <button class="ctl-btn" id="btn-thrust">&#9650;</button>
+        <button class="ctl-btn ctl-fire" id="btn-fire">FIRE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>
