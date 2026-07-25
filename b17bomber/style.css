@@ -164,33 +164,57 @@ button:active { transform: scale(0.96); }
 }
 #briefing.show { display: flex; }
 #briefing .briefing-title { font-size: 1.15rem; font-weight: 700; color: var(--gold); margin-bottom: 2px; }
-#briefing .briefing-sub { font-size: 0.78rem; opacity: 0.75; margin-bottom: 4px; }
-#briefing .briefing-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+#briefing .briefing-sub { font-size: 0.78rem; opacity: 0.75; margin-bottom: 4px; max-width: 480px; }
+
+.target-map {
+  position: relative;
   width: 100%;
-  max-width: 420px;
-}
-.target-card {
-  background: #ffffff12;
+  max-width: 520px;
+  height: min(46vh, 320px);
+  min-height: 220px;
+  background: linear-gradient(180deg, #123018 0%, #0c2210 100%);
   border: 1px solid #ffffff33;
-  border-radius: 10px;
-  padding: 10px 8px;
-  color: #f2f2f2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.78rem;
-  text-align: center;
+  border-radius: 12px;
+  overflow: visible;
 }
-.target-card .target-icon { font-size: 1.6rem; }
-.target-card .target-name { font-weight: 700; color: var(--gold); font-size: 0.85rem; }
-.target-card .target-desc { opacity: 0.75; font-size: 0.7rem; line-height: 1.25; }
-.target-card .target-value { opacity: 0.9; font-size: 0.72rem; }
-.target-card:hover { background: #ffffff22; border-color: var(--gold); }
-.target-card:active { transform: scale(0.97); }
+.map-endpoint {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #f2f2f2aa;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 6px 3px;
+}
+.map-base { left: 4px; }
+.map-zone { right: 4px; }
+.map-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff18;
+  border: 2px solid #ffffff55;
+  font-size: 1.1rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f2f2f2;
+}
+.map-marker:hover { background: #ffffff30; }
+.map-marker.armed { background: var(--gold); border-color: var(--gold); transform: translate(-50%, -50%) scale(1.15); }
+.map-info {
+  font-size: 0.76rem;
+  opacity: 0.85;
+  min-height: 2.4em;
+  max-width: 480px;
+  padding: 0 6px;
+}
 
 #hint { font-size: 0.76rem; opacity: 0.6; margin: 0; text-align: center; }
 
@@ -227,5 +251,5 @@ button:active { transform: scale(0.96); }
   #table { padding: 6px; gap: 6px; }
   .ctl-btn { min-width: 44px; height: 38px; font-size: 0.7rem; }
   #hint { font-size: 0.68rem; }
-  .briefing-grid { grid-template-columns: 1fr; max-width: 260px; }
+  .map-marker { width: 28px; height: 28px; font-size: 0.9rem; }
 }

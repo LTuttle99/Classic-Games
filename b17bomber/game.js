@@ -126,6 +126,7 @@ function newGame() {
     lastFlakHit: 0,
     briefingDone: false,
     primaryType: null,
+    primaryTargetId: null,
     primaryObjectiveComplete: false,
     engines: Array(ENGINE_COUNT).fill('ok'),
     leg: 'outbound',
@@ -163,11 +164,15 @@ function updateEngineFires(game, dt) {
 
 function setInput(game, partial) { Object.assign(game.input, partial); }
 
-// Pre-mission briefing: picks the primary objective type. The mission clock
-// (update()) is gated until this is called.
-function chooseTarget(game, type) {
-  if (!TARGET_TYPES[type] || game.briefingDone) return false;
-  game.primaryType = type;
+// Pre-mission briefing: picks one specific target (by id, as shown on the
+// route map) as the primary objective. The mission clock (update()) is
+// gated until this is called.
+function chooseTarget(game, targetId) {
+  if (game.briefingDone) return false;
+  const target = game.targets.find(t => t.id === targetId);
+  if (!target) return false;
+  game.primaryTargetId = targetId;
+  game.primaryType = target.type;
   game.briefingDone = true;
   return true;
 }
@@ -218,7 +223,7 @@ function resolveBomb(game, bomb) {
   if (hitTarget) {
     hitTarget.destroyed = true;
     const info = TARGET_TYPES[hitTarget.type];
-    const isPrimary = hitTarget.type === game.primaryType;
+    const isPrimary = hitTarget.id === game.primaryTargetId;
     hitTarget.pointsAwarded = info.value * (isPrimary ? PRIMARY_BONUS_MULT : 1);
     hitTarget.wasPrimary = isPrimary;
     game.score += hitTarget.pointsAwarded;
@@ -312,7 +317,8 @@ function finalizeIfOver(game) {
     game.hp = 0; game.over = true; game.win = false;
   } else if (game.distance >= TOTAL_LENGTH) {
     game.distance = TOTAL_LENGTH;
-    const primaryCleared = !game.targets.some(t => t.type === game.primaryType && !t.destroyed);
+    const primaryTarget = game.targets.find(t => t.id === game.primaryTargetId);
+    const primaryCleared = !!primaryTarget && primaryTarget.destroyed;
     game.primaryObjectiveComplete = primaryCleared;
     if (primaryCleared) game.score += PRIMARY_COMPLETE_BONUS;
     game.score += Math.round(game.hp * 2 + game.bombsLeft * 5);

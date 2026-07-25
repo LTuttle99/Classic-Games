@@ -59,6 +59,7 @@ const SFX = {
   missionWin: () => { beep({ freq: 440, dur: 0.15, vol: 0.2 }); beep({ freq: 660, dur: 0.2, vol: 0.2, delay: 0.15 }); beep({ freq: 880, dur: 0.32, vol: 0.22, delay: 0.32 }); },
   shotDown: () => beep({ freq: 260, sweep: 50, dur: 1.1, type: 'sawtooth', vol: 0.18 }),
   crashed: () => { beep({ freq: 200, sweep: 30, dur: 1.4, type: 'sawtooth', vol: 0.2 }); noiseBurst({ dur: 0.6, vol: 0.3, delay: 0.9 }); },
+  fighterSpawn: () => { beep({ freq: 520, sweep: 720, dur: 0.16, type: 'triangle', vol: 0.15 }); beep({ freq: 520, sweep: 720, dur: 0.16, type: 'triangle', vol: 0.15, delay: 0.2 }); },
 };
 
 function setSoundOn(on) {
@@ -248,7 +249,26 @@ function drawBombardier(ctx, c) {
   }
 
   drawBombsight(ctx, c);
+  drawFighterWarning(ctx, c);
   drawCockpitFrame(ctx, c, 'bombardier');
+}
+
+// Fighters are only rendered in the gunner view, so without this the
+// bombardier has zero warning before a fighter reaches attack range —
+// damage would land with no visible cause. Pulses faster/redder as the
+// nearest fighter closes in.
+function drawFighterWarning(ctx, c) {
+  if (game.view !== 'bombardier' || game.fighters.length === 0) return;
+  const nearest = Math.min(...game.fighters.map(f => f.closing));
+  const urgent = nearest < 0.35;
+  const pulse = 0.5 + 0.5 * Math.sin(game.elapsed * (urgent ? 14 : 6));
+  ctx.save();
+  ctx.globalAlpha = 0.55 + pulse * 0.45;
+  ctx.fillStyle = urgent ? '#ff3b3b' : '#ffb347';
+  ctx.font = `bold ${Math.max(11, c.width * 0.04)}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(urgent ? '⚠ FIGHTER ATTACKING' : '⚠ FIGHTER INBOUND — SWITCH VIEW', c.width / 2, c.height * 0.12);
+  ctx.restore();
 }
 
 function drawBombsight(ctx, c) {
@@ -398,6 +418,36 @@ function drawCockpitFrame(ctx, c, mode) {
   ctx.closePath(); ctx.fill();
 }
 
+// Cockpit instrument gauges — altitude (with the flak-safe line marked, so
+// the danger zone is something you can see and choose to avoid, not a
+// hidden dice roll) and throttle. Drawn in both views since they apply
+// regardless of which one you're looking at.
+function drawVerticalGauge(ctx, x, y, w, h, frac, color, label, warnLine) {
+  frac = Math.max(0, Math.min(1, frac));
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1; ctx.strokeRect(x, y, w, h);
+  const fillH = h * frac;
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y + h - fillH, w, fillH);
+  if (warnLine !== null) {
+    const wy = y + h - h * warnLine;
+    ctx.strokeStyle = 'rgba(255,70,60,0.9)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x - 3, wy); ctx.lineTo(x + w + 3, wy); ctx.stroke();
+  }
+  ctx.fillStyle = '#f2f2f2';
+  ctx.font = `bold ${Math.max(8, w * 0.55)}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillText(label, x + w / 2, y - 6);
+}
+
+function drawInstruments(ctx, c) {
+  const gw = c.width * 0.045, gh = c.height * 0.15;
+  const y = c.height - gh - 14;
+  drawVerticalGauge(ctx, c.width * 0.05, y, gw, gh, (game.altitude - MIN_ALT) / (MAX_ALT - MIN_ALT), '#8fc7ff', 'ALT', (FLAK_SAFE_ALT - MIN_ALT) / (MAX_ALT - MIN_ALT));
+  drawVerticalGauge(ctx, c.width * 0.95 - gw, y, gw, gh, game.throttle, '#ffb347', 'THR', null);
+}
+
 function draw() {
   const c = canvas();
   const ctx = c.getContext('2d');
@@ -405,6 +455,7 @@ function draw() {
   if (shakeMag > 0) ctx.translate((Math.random() - 0.5) * shakeMag * 2, (Math.random() - 0.5) * shakeMag * 2);
   if (game.view === 'bombardier') drawBombardier(ctx, c);
   else drawGunner(ctx, c);
+  drawInstruments(ctx, c);
   drawParticles(ctx);
   drawDamageVignette(ctx, c);
   drawFlash(ctx, c);
@@ -454,6 +505,7 @@ function playTransitionFeedback(before, after, prevFighterScreenState) {
   const c = canvas();
   const fighterKilledThisFrame = after.score > before.score && after.destroyedCount === before.destroyedCount && after.fighterCount <= before.fighterCount;
 
+  if (after.fighterCount > before.fighterCount) SFX.fighterSpawn();
   if (after.destroyedCount > before.destroyedCount) SFX.hitTarget();
   checkTargetExplosions(c);
 
@@ -546,24 +598,52 @@ function showBriefing() {
   el.appendChild(title);
   const sub = document.createElement('div');
   sub.className = 'briefing-sub';
-  sub.textContent = 'Choose your primary objective — hitting it scores double, and clearing it awards a completion bonus.';
+  sub.textContent = 'Tap a target on the map to make it your primary objective — hitting it scores double, and destroying it awards a completion bonus.';
   el.appendChild(sub);
-  const grid = document.createElement('div');
-  grid.className = 'briefing-grid';
-  for (const type of Object.keys(TARGET_TYPES)) {
-    const info = TARGET_TYPES[type];
-    const card = document.createElement('button');
-    card.className = 'target-card';
-    card.innerHTML = `<div class="target-icon">${info.icon}</div><div class="target-name">${info.name}</div><div class="target-desc">${info.desc}</div><div class="target-value">${info.value} pts (x2 if primary)</div>`;
-    bindTap(card, () => {
+
+  const mapWrap = document.createElement('div');
+  mapWrap.className = 'target-map';
+  const base = document.createElement('div');
+  base.className = 'map-endpoint map-base';
+  base.textContent = 'BASE';
+  mapWrap.appendChild(base);
+  const zone = document.createElement('div');
+  zone.className = 'map-endpoint map-zone';
+  zone.textContent = 'TARGET ZONE';
+  mapWrap.appendChild(zone);
+
+  let armedId = null;
+  const sorted = game.targets.slice().sort((a, b) => a.distance - b.distance);
+  for (const t of sorted) {
+    const typeInfo = TARGET_TYPES[t.type];
+    const marker = document.createElement('button');
+    marker.className = 'map-marker';
+    marker.style.left = `${(t.distance / TRACK_LENGTH) * 100}%`;
+    marker.style.top = `${50 + t.lateral * 38}%`;
+    marker.textContent = typeInfo.icon;
+    bindTap(marker, () => {
+      if (armedId === t.id) {
+        SFX.click();
+        chooseTarget(game, t.id);
+        el.classList.remove('show');
+        updateHud();
+        return;
+      }
       SFX.click();
-      chooseTarget(game, type);
-      el.classList.remove('show');
-      updateHud();
+      armedId = t.id;
+      document.querySelectorAll('.map-marker').forEach(m => m.classList.remove('armed'));
+      marker.classList.add('armed');
+      info.textContent = `${typeInfo.icon} ${typeInfo.name} — ${typeInfo.desc} ${typeInfo.value} pts (x2 as primary). Tap again to confirm.`;
     });
-    grid.appendChild(card);
+    mapWrap.appendChild(marker);
   }
-  el.appendChild(grid);
+  el.appendChild(mapWrap);
+
+  const info = document.createElement('div');
+  info.className = 'map-info';
+  info.textContent = 'Tap a marker to see details, tap again to confirm.';
+  el.appendChild(info);
+
   el.classList.add('show');
 }
 
