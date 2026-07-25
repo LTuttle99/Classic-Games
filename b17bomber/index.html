@@ -18,6 +18,7 @@
       <div class="score-pill"><span class="team-label">HP</span><span id="hp">100</span></div>
       <div class="score-pill"><span class="team-label">Bombs</span><span id="bombs">16</span></div>
       <div class="score-pill" id="objective-pill"><span class="team-label">Target</span><span id="objective">—</span></div>
+      <div class="score-pill" id="engines-pill"><span class="team-label">Engines</span><span id="engines-icons" class="engine-icons"></span></div>
     </div>
     <button class="icon-btn" id="sound-btn" title="Toggle sound">&#128266;</button>
     <button id="new-game-btn">Restart</button>
@@ -27,13 +28,17 @@
     <div id="board-wrap">
       <canvas id="canvas"></canvas>
       <div id="overlay"></div>
-      <div id="briefing"></div>
       <div id="viewLabel">BOMBARDIER</div>
+      <div id="legLabel">OUTBOUND</div>
     </div>
 
     <div id="controls">
       <div class="ctl-col">
         <button class="ctl-btn" id="btn-alt-up" title="Climb">&#9650;ALT</button>
+        <div class="ctl-row">
+          <button class="ctl-btn" id="btn-aim-left" title="Aim left">&larr;</button>
+          <button class="ctl-btn" id="btn-aim-right" title="Aim right">&rarr;</button>
+        </div>
         <button class="ctl-btn" id="btn-alt-down" title="Dive">&#9660;ALT</button>
       </div>
       <div class="ctl-col ctl-center">
@@ -45,8 +50,9 @@
         <button class="ctl-btn" id="btn-throttle-down" title="Throttle down">THR&#9660;</button>
       </div>
     </div>
-    <p id="hint">Move the mouse (or drag on touch) over the view to aim. Bombardier: lead your target before dropping. Gunner: track fighters and fire.</p>
+    <p id="hint">Drag on the view to aim (mouse or touch), or use the &larr;/&rarr; buttons. Bombardier: lead your target before dropping. Gunner: track fighters and fire.</p>
   </div>
+  <div id="briefing"></div>
 </div>
 
 <script src="game.js"></script>

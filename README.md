@@ -42,7 +42,7 @@ Open `index.html` for a hub page linking to each game.
 | Asteroids | `asteroids/` | Thrust/rotation/momentum physics, screen wrap, splitting asteroids, lives |
 | 8-Ball Pool | `pool/` | Multi-ball physics — friction, cushions, pockets — vs. an AI that evaluates real shots (angle/power) |
 | Tower Defense | `towerdefense/` | Enemies follow a fixed route, escalating waves, 4 tower types with upgrades, gold/lives economy |
-| B-17 Bomber | `b17bomber/` | Pick a primary target at mission briefing, then dual view — bombardier (mouse/touch aim, lead your target) and gunner (shoot down fighters) — with sound |
+| B-17 Bomber | `b17bomber/` | Pick a primary target at mission briefing, fly a round trip out and back (bombardier + gunner views, mouse/touch aim), managing 4 engines that can catch fire and fail — with sound |
 
 Each game is fully self-contained in its own folder (`index.html`, `style.css`,
 `game.js` for engine/AI, `ui.js` for rendering) — nothing is shared between

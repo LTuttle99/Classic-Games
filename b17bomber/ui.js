@@ -55,8 +55,10 @@ const SFX = {
   planeHit: () => beep({ freq: 180, sweep: 90, dur: 0.3, type: 'square', vol: 0.22 }),
   flak: () => beep({ freq: 130, sweep: 55, dur: 0.22, type: 'square', vol: 0.2 }),
   overheat: () => beep({ freq: 900, sweep: 300, dur: 0.2, type: 'square', vol: 0.14 }),
+  engineHit: () => { beep({ freq: 110, sweep: 40, dur: 0.4, type: 'sawtooth', vol: 0.2 }); noiseBurst({ dur: 0.25, vol: 0.14, delay: 0.05 }); },
   missionWin: () => { beep({ freq: 440, dur: 0.15, vol: 0.2 }); beep({ freq: 660, dur: 0.2, vol: 0.2, delay: 0.15 }); beep({ freq: 880, dur: 0.32, vol: 0.22, delay: 0.32 }); },
   shotDown: () => beep({ freq: 260, sweep: 50, dur: 1.1, type: 'sawtooth', vol: 0.18 }),
+  crashed: () => { beep({ freq: 200, sweep: 30, dur: 1.4, type: 'sawtooth', vol: 0.2 }); noiseBurst({ dur: 0.6, vol: 0.3, delay: 0.9 }); },
 };
 
 function setSoundOn(on) {
@@ -289,6 +291,8 @@ function draw() {
 
 /* ------------------------------------------- HUD ------------------------------------------- */
 
+const ENGINE_ICON = { ok: '🟢', smoking: '🟡', dead: '🔴' };
+
 function updateHud() {
   $('#score').textContent = game.score;
   $('#best').textContent = game.best;
@@ -298,6 +302,14 @@ function updateHud() {
   $('#btn-action').textContent = game.view === 'bombardier' ? 'Drop Bomb' : 'Fire';
   const objInfo = game.primaryType ? TARGET_TYPES[game.primaryType] : null;
   $('#objective').textContent = objInfo ? `${objInfo.icon} ${objInfo.name}` : '—';
+  $('#engines-icons').textContent = game.engines.map(s => ENGINE_ICON[s]).join('');
+  const legLabel = $('#legLabel');
+  if (game.briefingDone && !game.over && game.leg === 'return') {
+    legLabel.textContent = 'RETURNING TO BASE';
+    legLabel.classList.add('show');
+  } else {
+    legLabel.classList.remove('show');
+  }
 }
 
 /* ---------------------------------------- game loop ---------------------------------------- */
@@ -311,6 +323,7 @@ function snapshot() {
     score: game.score,
     hp: game.hp,
     lastFlakHit: game.lastFlakHit,
+    lastEngineHit: game.lastEngineHit,
     gunLocked: game.gunLocked,
     over: game.over,
   };
@@ -319,13 +332,18 @@ function snapshot() {
 function playTransitionSounds(before, after) {
   if (after.destroyedCount > before.destroyedCount) SFX.hitTarget();
   if (after.lastFlakHit !== before.lastFlakHit) SFX.flak();
+  if (after.lastEngineHit !== before.lastEngineHit) SFX.engineHit();
   if (after.score > before.score && after.destroyedCount === before.destroyedCount) {
     // score jumped without a new target destroyed this frame -> a fighter kill
     if (after.fighterCount <= before.fighterCount) SFX.fighterKill();
   }
   if (after.fighterCount < before.fighterCount && after.score === before.score) SFX.planeHit();
   if (!before.gunLocked && after.gunLocked) SFX.overheat();
-  if (!before.over && after.over) { if (game.win) SFX.missionWin(); else SFX.shotDown(); }
+  if (!before.over && after.over) {
+    if (game.win) SFX.missionWin();
+    else if (game.crashed) SFX.crashed();
+    else SFX.shotDown();
+  }
 }
 
 let gunFireTimer = 0;
@@ -394,7 +412,7 @@ function showEndOverlay() {
   overlay.classList.add('show');
   const msg = document.createElement('div');
   msg.className = 'overlay-msg';
-  msg.textContent = game.win ? 'Mission Complete' : 'Shot Down';
+  msg.textContent = game.win ? 'Mission Complete' : game.crashed ? 'Engines Out — Went Down' : 'Shot Down';
   overlay.appendChild(msg);
   const sub = document.createElement('div');
   sub.className = 'overlay-sub';
@@ -516,6 +534,8 @@ function boot() {
 
   bindHold($('#btn-alt-up'), 'altUp');
   bindHold($('#btn-alt-down'), 'altDown');
+  bindHold($('#btn-aim-left'), 'aimLeft');
+  bindHold($('#btn-aim-right'), 'aimRight');
   bindHold($('#btn-throttle-up'), 'throttleUp');
   bindHold($('#btn-throttle-down'), 'throttleDown');
 

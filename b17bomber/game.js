@@ -8,7 +8,8 @@
    they close to attack range). Flak punishes flying low over live targets.
    ========================================================================= */
 
-const TRACK_LENGTH = 4000;
+const TRACK_LENGTH = 4000; // outbound leg to the target zone
+const TOTAL_LENGTH = TRACK_LENGTH * 2; // outbound + return leg home
 const MIN_ALT = 1, MAX_ALT = 10;
 const ALT_CHANGE_RATE = 3; // units/sec
 const MIN_SPEED = 40, MAX_SPEED = 110;
@@ -33,6 +34,15 @@ const GUN_OVERHEAT_RESET = 0.25;
 const GUN_DPS = 2.4;
 const GUN_LATERAL_TOL = 0.28;
 const BEST_KEY = 'b17bomber-best';
+
+// Engines: the B-17's signature damage model. A hit has a chance to knock
+// an engine from ok -> smoking -> dead; a smoking engine left burning can
+// also die on its own over time. Each dead engine caps max speed, and
+// losing all four brings the plane down regardless of remaining hull HP.
+const ENGINE_COUNT = 4;
+const ENGINE_DAMAGE_CHANCE = 0.35;
+const ENGINE_FIRE_SPREAD_PER_SEC = 0.03;
+const ENGINE_SPEED_PENALTY = 0.22; // fraction of max speed lost per dead engine
 
 // Mission briefing: the player picks one of these as the primary objective
 // before takeoff. Hitting a primary-type target pays double, and clearing
@@ -117,7 +127,38 @@ function newGame() {
     briefingDone: false,
     primaryType: null,
     primaryObjectiveComplete: false,
+    engines: Array(ENGINE_COUNT).fill('ok'),
+    leg: 'outbound',
+    crashed: false,
+    lastEngineHit: 0,
   };
+}
+
+function deadEngineCount(game) { return game.engines.filter(e => e === 'dead').length; }
+
+// A hit has a chance to worsen one engine: an already-smoking engine is
+// more likely to be finished off than a fresh one is to start smoking.
+function damageEngine(game) {
+  const smoking = [];
+  const ok = [];
+  game.engines.forEach((s, i) => { if (s === 'smoking') smoking.push(i); else if (s === 'ok') ok.push(i); });
+  if (smoking.length && Math.random() < 0.5) {
+    game.engines[smoking[Math.floor(Math.random() * smoking.length)]] = 'dead';
+  } else if (ok.length) {
+    game.engines[ok[Math.floor(Math.random() * ok.length)]] = 'smoking';
+  } else {
+    return;
+  }
+  game.lastEngineHit = game.elapsed;
+}
+
+function updateEngineFires(game, dt) {
+  for (let i = 0; i < game.engines.length; i++) {
+    if (game.engines[i] === 'smoking' && Math.random() < ENGINE_FIRE_SPREAD_PER_SEC * dt) {
+      game.engines[i] = 'dead';
+      game.lastEngineHit = game.elapsed;
+    }
+  }
 }
 
 function setInput(game, partial) { Object.assign(game.input, partial); }
@@ -201,6 +242,7 @@ function updateFlak(game, dt) {
   if (Math.random() < chancePerSec * dt * 10) { // scaled so dt~0.016 gives a sane per-frame probability
     game.hp -= rand(FLAK_DMG[0], FLAK_DMG[1]);
     game.lastFlakHit = game.elapsed;
+    if (Math.random() < ENGINE_DAMAGE_CHANCE) damageEngine(game);
   }
 }
 
@@ -222,6 +264,7 @@ function updateFighters(game, dt) {
     if (f.closing <= 0) {
       f.dead = true;
       game.hp -= rand(FIGHTER_DMG[0], FIGHTER_DMG[1]);
+      if (Math.random() < ENGINE_DAMAGE_CHANCE) damageEngine(game);
     }
   }
   game.fighters = game.fighters.filter(f => !f.dead);
@@ -252,10 +295,12 @@ function updateGun(game, dt) {
 
 function finalizeIfOver(game) {
   if (game.over) return;
-  if (game.hp <= 0) {
+  if (deadEngineCount(game) >= ENGINE_COUNT) {
+    game.over = true; game.win = false; game.crashed = true;
+  } else if (game.hp <= 0) {
     game.hp = 0; game.over = true; game.win = false;
-  } else if (game.distance >= TRACK_LENGTH) {
-    game.distance = TRACK_LENGTH;
+  } else if (game.distance >= TOTAL_LENGTH) {
+    game.distance = TOTAL_LENGTH;
     const primaryCleared = !game.targets.some(t => t.type === game.primaryType && !t.destroyed);
     game.primaryObjectiveComplete = primaryCleared;
     if (primaryCleared) game.score += PRIMARY_COMPLETE_BONUS;
@@ -272,7 +317,8 @@ function update(game, dt) {
 
   if (game.input.throttleUp) game.throttle = clamp(game.throttle + THROTTLE_RATE * dt, 0, 1);
   if (game.input.throttleDown) game.throttle = clamp(game.throttle - THROTTLE_RATE * dt, 0, 1);
-  game.speed = MIN_SPEED + game.throttle * (MAX_SPEED - MIN_SPEED);
+  const engineSpeedMul = Math.max(0.15, 1 - deadEngineCount(game) * ENGINE_SPEED_PENALTY);
+  game.speed = (MIN_SPEED + game.throttle * (MAX_SPEED - MIN_SPEED)) * engineSpeedMul;
 
   if (game.input.altUp) game.altitude = clamp(game.altitude + ALT_CHANGE_RATE * dt, MIN_ALT, MAX_ALT);
   if (game.input.altDown) game.altitude = clamp(game.altitude - ALT_CHANGE_RATE * dt, MIN_ALT, MAX_ALT);
@@ -286,11 +332,13 @@ function update(game, dt) {
   }
 
   game.distance += game.speed * dt;
+  if (game.leg === 'outbound' && game.distance >= TRACK_LENGTH) game.leg = 'return';
 
   updateBombs(game);
   updateFlak(game, dt);
   updateFighters(game, dt);
   updateGun(game, dt);
+  updateEngineFires(game, dt);
 
   finalizeIfOver(game);
 }
