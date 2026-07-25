@@ -1,0 +1,178 @@
+:root {
+  --gold: #e8c469;
+  --panel: #1a140eee;
+  --light: #eddcc0;
+  --dark: #a97c50;
+  --cell: 62px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(ellipse at center, #3a2a18 0%, #17100a 100%);
+  color: #f2f2f2;
+}
+
+#app { display: flex; flex-direction: column; height: 100vh; min-height: 620px; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  background: var(--panel);
+  box-shadow: 0 2px 8px #0006;
+  flex-wrap: wrap;
+}
+#topbar h1 { font-size: 1.2rem; margin: 0; color: var(--gold); letter-spacing: 1px; }
+.hub-link {
+  color: #f2f2f2cc;
+  text-decoration: none;
+  font-size: 0.8rem;
+  background: #00000040;
+  padding: 5px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+.hub-link:hover { background: #00000066; color: #fff; }
+#scores { display: flex; gap: 8px; flex-wrap: wrap; }
+.score-pill {
+  background: #00000055;
+  border: 1px solid #ffffff33;
+  border-radius: 20px;
+  padding: 4px 12px;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  max-width: 220px;
+}
+.score-pill .team-label { font-size: 0.7rem; opacity: 0.8; white-space: nowrap; }
+.score-pill span:last-child { font-size: 1rem; font-weight: 700; color: var(--gold); }
+#new-game-btn { margin-left: auto; }
+
+button {
+  background: var(--gold);
+  color: #2a1e00;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: scale(0.96); }
+
+#table { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: auto; }
+
+#board-wrap { position: relative; }
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(8, var(--cell));
+  grid-template-rows: repeat(8, var(--cell));
+  border: 4px solid #4d2f16;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px #0008;
+}
+
+.square {
+  width: var(--cell);
+  height: var(--cell);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: calc(var(--cell) * 0.72);
+  line-height: 1;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.square.light { background: var(--light); }
+.square.dark { background: var(--dark); }
+.square.selected { outline: 3px solid var(--gold); outline-offset: -3px; }
+.square.last-from, .square.last-to { box-shadow: inset 0 0 0 3px #7fb3ff88; }
+.square.in-check { box-shadow: inset 0 0 0 4px #e5453fcc; }
+.square.selectable { cursor: pointer; }
+.square.dest { cursor: pointer; }
+.square.dest::after {
+  content: '';
+  position: absolute;
+  width: 26%;
+  height: 26%;
+  border-radius: 50%;
+  background: #00000033;
+}
+.square.dest.has-piece::after {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: inset 0 0 0 4px #00000055;
+}
+.piece-glyph { pointer-events: none; filter: drop-shadow(0 2px 2px #00000066); }
+.piece-glyph.w { color: #fdfdf6; -webkit-text-stroke: 1px #333; }
+.piece-glyph.b { color: #1b1b1b; }
+
+#promo-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #000000aa;
+  border-radius: 6px;
+}
+#promo-overlay.show { display: flex; }
+.promo-box {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+}
+.promo-choice {
+  width: 56px;
+  height: 56px;
+  font-size: 2rem;
+  border-radius: 8px;
+  background: var(--light);
+  border: 2px solid var(--gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.promo-choice:hover { background: var(--gold); }
+
+#controls {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--panel);
+}
+.control-msg { font-size: 0.95rem; opacity: 0.9; }
+
+#log {
+  height: 76px;
+  overflow-y: auto;
+  background: #00000066;
+  font-size: 0.76rem;
+  padding: 6px 16px;
+  line-height: 1.4;
+  border-top: 1px solid #ffffff22;
+}
+
+@media (max-width: 640px) {
+  :root { --cell: 40px; }
+  #topbar h1 { display: none; }
+  .score-pill { max-width: 130px; }
+}

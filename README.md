@@ -1,6 +1,6 @@
 # Game Arcade
 
-Fourteen classic games, each playable against AI (or solo). Pure HTML/CSS/JS,
+Eighteen classic games, each playable against AI (or solo). Pure HTML/CSS/JS,
 no build step, no dependencies, no backend — everything runs client-side and
 deploys as static files.
 
@@ -26,6 +26,9 @@ Open `index.html` for a hub page linking to each game.
 | Tic-Tac-Toe | `tictactoe/` | Perfect-play minimax AI — unbeatable, best you can do is draw |
 | 2048 | `2048/` | Sliding tile merge game, arrow keys or swipe, best score saved locally |
 | Memory | `memory/` | Flip-and-match concentration game, easy/hard grid sizes, move + time tracking |
+| Chess | `chess/` | Full rules — castling, en passant, promotion, check/checkmate/stalemate, alpha-beta AI with piece-square tables |
+| Othello | `othello/` | Disc-flipping, alpha-beta AI that weighs corners and mobility heavily |
+| Minesweeper | `minesweeper/` | First-click-safe, flood-fill reveal, chording, flag-mode toggle for touch |
 
 ## Arcade
 
@@ -34,6 +37,7 @@ Open `index.html` for a hub page linking to each game.
 | Tetris | `tetris/` | 7-bag randomizer, next-piece preview, ghost piece, increasing speed |
 | Snake | `snake/` | Grid-tick movement, on-screen D-pad + keyboard, speeds up as you grow |
 | Pong | `pong/` | Real-time physics, mouse/touch/keyboard paddle control, first to 7 |
+| Breakout | `breakout/` | Paddle + ball + bricks, mouse/touch/keyboard control, lives, level speed-up |
 
 Each game is fully self-contained in its own folder (`index.html`, `style.css`,
 `game.js` for engine/AI, `ui.js` for rendering) — nothing is shared between
@@ -72,7 +76,7 @@ reliable.)
 
 3. The site will be live at `https://<you>.github.io/<repo>/` within a
    minute or two, with each game reachable at `/euchre/`, `/poker/`,
-   `/checkers/`, `/tetris/`, etc.
+   `/checkers/`, `/tetris/`, `/chess/`, etc.
 
 ### Uploading by drag-and-drop instead of git
 
@@ -91,10 +95,13 @@ be found at the repo root.
 - **Blackjack**: no split-hand support (hit/stand/double only).
 - **Tetris**: simplified (non-SRS) rotation system with basic wall kicks, no
   hold piece, single next-piece preview.
+- **Chess**: no 50-move rule, no threefold-repetition draw, and AI always
+  promotes to queen; a human player can still underpromote via the on-board
+  picker. Depth-3 alpha-beta search — beatable, not a full engine.
 - **Chip balances** (Blackjack, Poker) and **best scores** (2048, Snake,
-  Tetris) persist in the browser's `localStorage`, so they survive a page
-  reload but are local to that browser.
+  Tetris, Breakout) persist in the browser's `localStorage`, so they survive
+  a page reload but are local to that browser.
 - AI opponents in every game use hand-tuned heuristics or minimax search, not
-  a single unified engine — Tic-Tac-Toe and Checkers/Connect Four use
-  (alpha-beta) minimax and play very strong; Euchre, Hold'em, and UNO use
-  scoring heuristics and are beatable.
+  a single unified engine — Tic-Tac-Toe, Checkers, Connect Four, Othello, and
+  Chess all use (alpha-beta) minimax and play quite strong; Euchre, Hold'em,
+  and UNO use scoring heuristics and are more beatable.
