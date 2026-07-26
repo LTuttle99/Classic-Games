@@ -42,7 +42,7 @@ Open `index.html` for a hub page linking to each game.
 | Asteroids | `asteroids/` | Thrust/rotation/momentum physics, screen wrap, splitting asteroids, lives |
 | 8-Ball Pool | `pool/` | Multi-ball physics — friction, cushions, pockets — vs. an AI that evaluates real shots (angle/power) |
 | Tower Defense | `towerdefense/` | Enemies follow a fixed route, escalating waves, 4 tower types with upgrades, gold/lives economy |
-| B-17 Bomber | `b17bomber/` | Pick a specific primary target on the mission map, fly a round trip out and back (bombardier + gunner views, tap/click to act, drag to aim), managing 4 engines that can catch fire and fail, with fighter-inbound warnings and explosions/screen shake |
+| B-17 Bomber | `b17bomber/` | Modeled on the 1981 Intellivision original: a persistent campaign flying repeat missions from a 2D base map until shot down, 6 switchable stations (Pilot + Bombardier + 4 directional gunners with finite ammo, each independently knockable-out), free targeting of any visible target, and a throttle/pitch/fuel flight model with a real stall risk |
 
 Each game is fully self-contained in its own folder (`index.html`, `style.css`,
 `game.js` for engine/AI, `ui.js` for rendering) — nothing is shared between
@@ -110,13 +110,18 @@ be found at the repo root.
 - **Tower Defense**: enemies follow one fixed serpentine route computed at
   load, rather than dynamic pathfinding that reroutes around towers — towers
   simply can't be placed on route tiles.
-- **B-17 Bomber**: altitude, flak risk, and bomb ballistics are an abstracted
-  arcade model (not real aerodynamics), tuned so leading a bomb release
-  ahead of the target is a real skill, not literal flight physics.
+- **B-17 Bomber**: altitude, flak risk, fuel burn, and bomb ballistics are an
+  abstracted arcade model (not real aerodynamics) — throttle sets power and
+  fuel burn, pitch trades altitude for airspeed, and dropping below stall
+  speed costs altitude fast, but the mission "map" is a 1D distance-to-target
+  track per site rather than live 2D navigation. Landing safely banks that
+  mission's score into a running campaign total that only resets when you're
+  shot down, ditch, crash, or retire — dying mid-mission forfeits whatever
+  wasn't banked yet.
 - **Chip balances** (Blackjack, Poker), **best scores** (2048, Snake, Tetris,
-  Breakout, Pac-Man, Asteroids, B-17 Bomber), **best wave** (Tower Defense),
-  and **wins** (Pool) persist in the browser's `localStorage`, so they
-  survive a page reload but are local to that browser.
+  Breakout, Pac-Man, Asteroids), **best campaign score** (B-17 Bomber),
+  **best wave** (Tower Defense), and **wins** (Pool) persist in the browser's
+  `localStorage`, so they survive a page reload but are local to that browser.
 - AI opponents in every game use hand-tuned heuristics or minimax search, not
   a single unified engine — Tic-Tac-Toe, Checkers, Connect Four, Othello, and
   Chess all use (alpha-beta) minimax and play quite strong; Euchre, Hold'em,

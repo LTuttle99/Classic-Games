@@ -97,9 +97,36 @@ button:active { transform: scale(0.96); }
 }
 #canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
 
-#viewLabel {
+#station-strip {
   position: absolute;
   top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  background: #000000a0;
+  border: 1px solid #ffffff33;
+  border-radius: 16px;
+  padding: 4px;
+  z-index: 5;
+}
+.station-btn {
+  min-width: 30px;
+  height: 26px;
+  padding: 0 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: transparent;
+  color: #f2f2f2cc;
+  border: none;
+}
+.station-btn.active { background: var(--gold); color: #2a1e00; }
+.station-btn:hover:not(.active) { background: #ffffff22; }
+
+#viewLabel {
+  position: absolute;
+  top: 40px;
   left: 50%;
   transform: translateX(-50%);
   background: #000000a0;
@@ -115,7 +142,7 @@ button:active { transform: scale(0.96); }
 
 #legLabel {
   position: absolute;
-  top: 34px;
+  top: 68px;
   left: 50%;
   transform: translateX(-50%);
   background: #000000a0;
@@ -166,55 +193,74 @@ button:active { transform: scale(0.96); }
 #briefing .briefing-title { font-size: 1.15rem; font-weight: 700; color: var(--gold); margin-bottom: 2px; }
 #briefing .briefing-sub { font-size: 0.78rem; opacity: 0.75; margin-bottom: 4px; max-width: 480px; }
 
-.target-map {
-  position: relative;
-  width: 100%;
-  max-width: 520px;
-  height: min(46vh, 320px);
-  min-height: 220px;
-  background: linear-gradient(180deg, #123018 0%, #0c2210 100%);
+.skill-row { display: flex; gap: 6px; }
+.skill-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  background: #ffffff18;
+  color: #f2f2f2;
   border: 1px solid #ffffff33;
-  border-radius: 12px;
+  font-weight: 700;
+}
+.skill-btn.active { background: var(--gold); color: #2a1e00; border-color: var(--gold); }
+.skill-name { font-size: 0.7rem; opacity: 0.75; letter-spacing: 0.5px; text-transform: uppercase; margin-top: -4px; }
+
+.bombload-row { display: flex; align-items: center; gap: 10px; }
+.stepper-btn { width: 32px; height: 32px; padding: 0; border-radius: 8px; font-size: 1.1rem; line-height: 1; }
+.bombload-value { font-size: 0.85rem; font-weight: 700; min-width: 90px; }
+
+.radial-map {
+  position: relative;
+  width: min(80vw, 46vh, 420px);
+  height: 0;
+  padding-top: min(80vw, 46vh, 420px); /* square regardless of flex-column context aspect-ratio quirks */
+  background: radial-gradient(circle at center, #123018 0%, #0c2210 70%, #081a0c 100%);
+  border: 1px solid #ffffff33;
+  border-radius: 50%;
   overflow: visible;
 }
-.map-endpoint {
+.map-base-icon {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #f2f2f2aa;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  padding: 6px 3px;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.4rem;
 }
-.map-base { left: 4px; }
-.map-zone { right: 4px; }
-.map-marker {
+.map-site {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #ffffff18;
   border: 2px solid #ffffff55;
-  font-size: 1.1rem;
+  font-size: 1rem;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #f2f2f2;
 }
-.map-marker:hover { background: #ffffff30; }
-.map-marker.armed { background: var(--gold); border-color: var(--gold); transform: translate(-50%, -50%) scale(1.15); }
-.map-info {
+.map-site:hover { background: #ffffff30; }
+.map-site.selected { background: var(--gold); border-color: var(--gold); transform: translate(-50%, -50%) scale(1.15); }
+.map-preview {
   font-size: 0.76rem;
   opacity: 0.85;
   min-height: 2.4em;
   max-width: 480px;
   padding: 0 6px;
 }
+.takeoff-btn { font-size: 1rem; padding: 10px 28px; }
+.takeoff-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.retire-btn {
+  background: transparent;
+  color: #f2f2f2aa;
+  border: 1px solid #ffffff33;
+  font-weight: 600;
+  font-size: 0.76rem;
+}
+.retire-btn:hover { background: #ffffff12; }
 
 #hint { font-size: 0.76rem; opacity: 0.6; margin: 0; text-align: center; }
 
@@ -251,5 +297,8 @@ button:active { transform: scale(0.96); }
   #table { padding: 6px; gap: 6px; }
   .ctl-btn { min-width: 44px; height: 38px; font-size: 0.7rem; }
   #hint { font-size: 0.68rem; }
-  .map-marker { width: 28px; height: 28px; font-size: 0.9rem; }
+  .map-site { width: 26px; height: 26px; font-size: 0.85rem; }
+  .radial-map { width: min(88vw, 42vh, 340px); padding-top: min(88vw, 42vh, 340px); }
+  #station-strip { gap: 2px; padding: 3px; }
+  .station-btn { min-width: 24px; height: 22px; font-size: 0.7rem; padding: 0 4px; }
 }

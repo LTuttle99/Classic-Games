@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>B-17 Bomber</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <div id="app">
@@ -13,12 +13,13 @@
     <a class="hub-link" href="../">&larr; Games</a>
     <h1>B-17 Bomber</h1>
     <div id="scores">
-      <div class="score-pill"><span class="team-label">Score</span><span id="score">0</span></div>
+      <div class="score-pill"><span class="team-label">Campaign</span><span id="score">0</span></div>
+      <div class="score-pill"><span class="team-label">Mission</span><span id="missionScore">—</span></div>
       <div class="score-pill"><span class="team-label">Best</span><span id="best">0</span></div>
-      <div class="score-pill"><span class="team-label">HP</span><span id="hp">100</span></div>
-      <div class="score-pill"><span class="team-label">Bombs</span><span id="bombs">16</span></div>
-      <div class="score-pill" id="objective-pill"><span class="team-label">Target</span><span id="objective">—</span></div>
-      <div class="score-pill" id="engines-pill"><span class="team-label">Engines</span><span id="engines-icons" class="engine-icons"></span></div>
+      <div class="score-pill"><span class="team-label">HP</span><span id="hp">—</span></div>
+      <div class="score-pill"><span class="team-label">Fuel</span><span id="fuel">—</span></div>
+      <div class="score-pill"><span class="team-label">Bombs</span><span id="bombs">—</span></div>
+      <div class="score-pill" id="stations-pill"><span class="team-label">Guns</span><span id="stations-icons" class="engine-icons"></span></div>
     </div>
     <button class="icon-btn" id="sound-btn" title="Toggle sound">&#128266;</button>
     <button id="new-game-btn">Restart</button>
@@ -27,34 +28,39 @@
   <div id="table">
     <div id="board-wrap">
       <canvas id="canvas"></canvas>
+      <div id="station-strip">
+        <button class="station-btn" data-view="pilot" title="Pilot">&#127911;</button>
+        <button class="station-btn" data-view="bombardier" title="Bombardier">&#128163;</button>
+        <button class="station-btn" data-view="gun-N" title="Nose gun — 12 o'clock">12</button>
+        <button class="station-btn" data-view="gun-E" title="Right gun — 3 o'clock">3</button>
+        <button class="station-btn" data-view="gun-S" title="Tail gun — 6 o'clock">6</button>
+        <button class="station-btn" data-view="gun-W" title="Left gun — 9 o'clock">9</button>
+      </div>
       <div id="overlay"></div>
-      <div id="viewLabel">BOMBARDIER</div>
+      <div id="viewLabel">PILOT</div>
       <div id="legLabel">OUTBOUND</div>
     </div>
 
     <div id="controls">
       <div class="ctl-col">
-        <button class="ctl-btn" id="btn-alt-up" title="Climb">&#9650;ALT</button>
+        <button class="ctl-btn" id="btn-alt-up" title="Climb (Pilot station only)">&#9650;CLIMB</button>
         <div class="ctl-row">
           <button class="ctl-btn" id="btn-aim-left" title="Aim left">&larr;</button>
           <button class="ctl-btn" id="btn-aim-right" title="Aim right">&rarr;</button>
         </div>
-        <button class="ctl-btn" id="btn-alt-down" title="Dive">&#9660;ALT</button>
-      </div>
-      <div class="ctl-col ctl-center">
-        <button class="ctl-btn" id="btn-view">Switch View</button>
+        <button class="ctl-btn" id="btn-alt-down" title="Dive (Pilot station only)">&#9660;DIVE</button>
       </div>
       <div class="ctl-col">
-        <button class="ctl-btn" id="btn-throttle-up" title="Throttle up">THR&#9650;</button>
-        <button class="ctl-btn" id="btn-throttle-down" title="Throttle down">THR&#9660;</button>
+        <button class="ctl-btn" id="btn-throttle-up" title="Throttle up (Pilot station only)">RPM&#9650;</button>
+        <button class="ctl-btn" id="btn-throttle-down" title="Throttle down (Pilot station only)">RPM&#9660;</button>
       </div>
     </div>
-    <p id="hint">Tap or click the view to drop a bomb / fire — drag (or use &larr;/&rarr;) to aim first without firing.</p>
+    <p id="hint">Switch stations above (or keys 1-6). Tap the view to drop a bomb / fire a burst — drag (or &larr;/&rarr;) to aim first. Climb/Dive/RPM only work from the Pilot station.</p>
   </div>
   <div id="briefing"></div>
 </div>
 
-<script src="game.js"></script>
-<script src="ui.js"></script>
+<script src="game.js?v=4"></script>
+<script src="ui.js?v=4"></script>
 </body>
 </html>
